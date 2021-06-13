@@ -39,7 +39,8 @@ extension UIViewRepresentable where Coordinator == Void {
 
 // MARK: - AnyUIViewRepresentable
 
-public struct AnyUIViewRepresentable<View: UIView, Coordinator>: UIViewRepresentable {
+public struct AnyUIViewRepresentable<View: UIView, Coordinator>
+: UIViewRepresentable {
   public typealias Context = UIViewRepresentableContext<Coordinator>
 
   private let _reuseIdentifier: () -> String
