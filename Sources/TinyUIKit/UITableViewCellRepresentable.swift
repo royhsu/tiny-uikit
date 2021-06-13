@@ -7,14 +7,10 @@
 
 import UIKit
 
-public protocol UITableViewCellRepresentable {
+public protocol UITableViewCellRepresentable: UITableViewCellRegistration {
   associatedtype Cell: UITableViewCell
   typealias Coordinator = UITableViewCellRepresentableCoordinator
   typealias Context = UIViewRepresentableContext<Coordinator>
-  
-  var reuseIdentifier: String { get }
-  
-  var cellType: UITableViewCell.Type { get }
   
   /// Default implementation provided.
   func makeUICell(context: Context) -> Cell
