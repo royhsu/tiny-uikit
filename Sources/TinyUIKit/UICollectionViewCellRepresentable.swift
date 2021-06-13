@@ -14,7 +14,7 @@ public protocol UICollectionViewCellRepresentable {
   
   var reuseIdentifier: String { get }
   
-  var cellType: UITableViewCell.Type { get }
+  var cellType: UICollectionViewCell.Type { get }
   
   /// Default implementation provided.
   func makeUICell(context: Context) -> Cell
