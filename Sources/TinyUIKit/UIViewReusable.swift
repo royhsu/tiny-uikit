@@ -7,19 +7,7 @@
 
 import UIKit
 
-//public protocol UIViewReusable: UIView {
-//  /// Default implementation provided.
-//  /// Default implementation do nothing.
-//  func prepareForReuse()
-//}
-//
-//extension UIViewReusable {
-//  public func prepareForReuse() {}
-//}
-
-// MARK: - UIReusableView
-
-/// Convenient concrete view that conforms to UIViewReusable.
+/// This is a abstract class.
 open class UIReusableView: UIView {
   open func prepareForReuse() {}
 }
