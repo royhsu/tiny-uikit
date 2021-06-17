@@ -8,7 +8,7 @@
 import UIKit
 
 public protocol UIViewRepresentable {
-  associatedtype View: UIView
+  associatedtype View: UIReusableView
   associatedtype Coordinator = Void
   typealias Context = UIViewRepresentableContext<Coordinator>
   
@@ -28,9 +28,7 @@ public protocol UIViewRepresentable {
 }
 
 extension UIViewRepresentable {
-  public var reuseIdentifier: String {
-    String(describing: type(of: self))
-  }
+  public var reuseIdentifier: String { String(describing: type(of: self)) }
 }
 
 extension UIViewRepresentable where Coordinator == Void {
@@ -39,45 +37,32 @@ extension UIViewRepresentable where Coordinator == Void {
 
 // MARK: - AnyUIViewRepresentable
 
-public struct AnyUIViewRepresentable<View: UIView, Coordinator>
+public struct AnyUIViewRepresentable<View: UIReusableView, Coordinator>
 : UIViewRepresentable {
   public typealias Context = UIViewRepresentableContext<Coordinator>
 
   private let _reuseIdentifier: () -> String
-  private let _makeView: (Context) -> UIView
-  private let _updateView: (UIView, Context) -> Void
+  private let _makeView: (Context) -> UIReusableView
+  private let _updateView: (UIReusableView, Context) -> Void
   private let _makeCoordinator: () -> Coordinator
 
   public init<Value: UIViewRepresentable>(_ value: Value)
   where Value.View == View, Value.Coordinator == Coordinator {
     self._reuseIdentifier = { value.reuseIdentifier }
-    self._makeView = { context in
-      value.makeUIView(
-        context: .init(
-          coordinator: context.coordinator,
-          environment: context.environment
-        )
-      )
-    }
+    self._makeView = value.makeUIView
     self._updateView = { view, context in
-      value.updateUIView(
-        view as! Value.View,
-        context: .init(
-          coordinator: context.coordinator,
-          environment: context.environment
-        )
-      )
+      value.updateUIView(view as! View, context: context)
     }
     self._makeCoordinator = value.makeCoordinator
   }
 
   public var reuseIdentifier: String { _reuseIdentifier() }
   
-  public func makeUIView(context: Context) -> UIView {
+  public func makeUIView(context: Context) -> UIReusableView {
     _makeView(context)
   }
 
-  public func updateUIView(_ view: UIView, context: Context) {
+  public func updateUIView(_ view: UIReusableView, context: Context) {
     _updateView(view, context)
   }
   

@@ -10,6 +10,11 @@ import UIKit
 public final class UITableViewBridgeCell<Value: UIViewRepresentable>
 : UITableViewCell {
   private(set) var bridgeView: Value.View?
+  
+  public override func prepareForReuse() {
+    super.prepareForReuse()
+    bridgeView?.prepareForReuse()
+  }
 }
 
 extension UITableViewBridgeCell {
