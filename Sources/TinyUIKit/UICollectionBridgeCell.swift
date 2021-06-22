@@ -30,9 +30,12 @@ extension UICollectionViewBridgeCell {
       newView.translatesAutoresizingMaskIntoConstraints = false
       contentView.addSubview(newView)
       NSLayoutConstraint.activate([
+        // Horizontal.
         newView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
-        newView.topAnchor.constraint(equalTo: contentView.topAnchor),
         newView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
+        
+        // Vertical.
+        newView.topAnchor.constraint(equalTo: contentView.topAnchor),
         newView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
       ])
     }
