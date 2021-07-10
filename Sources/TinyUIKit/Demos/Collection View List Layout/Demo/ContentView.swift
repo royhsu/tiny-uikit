@@ -8,18 +8,24 @@
 import SwiftUI
 
 struct ContentView: View {
-    var body: some View {
-        Text("Hello, world!")
-            .padding()
-    }
+  var body: some View {
+    ContactList()
+  }
 }
 
 struct ContentView_Previews: PreviewProvider {
-    static var previews: some View {
-        ContentView()
-    }
+  static var previews: some View {
+    ContentView()
+  }
 }
 
-final class UIListViewController: UIViewController {
+struct ContactList: UIViewControllerRepresentable {
+  func makeUIViewController(context: Context) -> ContactListController {
+    ContactListController()
+  }
   
+  func updateUIViewController(
+    _ viewController: ContactListController,
+    context: Context)
+  {}
 }

@@ -76,7 +76,7 @@ open class UICollectionViewBridgeController<Coordinator>
 // MARK: - Helpers
 
 extension UICollectionViewBridgeController {
-  public typealias Item = UICollectionViewItem<UIView>
+  public typealias Item = UICollectionViewItem
   
   public struct Section {
     public var items: AnyCollection<Item>

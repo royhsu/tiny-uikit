@@ -7,29 +7,38 @@
 
 import UIKit
 
-public struct UITableViewSupplementary<UIViewType: UIView> {
+public struct UITableViewSupplementary {
   private let _reuseIdentifier: () -> String
+  private let _supplementaryViewType: () -> UITableViewSupplementaryView.Type
   private let _makeUITableViewSupplementaryView
-    : (Context) -> UITableViewSupplementaryViewType
+    : (Context) -> UITableViewSupplementaryView
   private let _updateUITableViewSupplementaryView
-    : (UITableViewSupplementaryViewType, Context) -> Void
+    : (UITableViewSupplementaryView, Context) -> Void
   public var onSelect: (() -> Void)?
   
   public init<Content: UIViewRepresentable>(
     content: Content,
     onSelect: (() -> Void)? = nil
-  )
-  where Content.UIViewType == UIViewType {
-    let _reuseIdentifier = {
-      String(describing: UITableViewSupplementaryViewType.self)
-    }
+  ) {
+    typealias SupplementaryView
+      = UITableViewSupplementaryBridgeView<Content.UIViewType>
+    
+    let _reuseIdentifier = { String(describing: SupplementaryView.self) }
     self._reuseIdentifier = _reuseIdentifier
+    self._supplementaryViewType = { SupplementaryView.self }
     self._makeUITableViewSupplementaryView = { context in
-      context.coordinator.tableView
-        .dequeueReusableHeaderFooterView(withIdentifier: _reuseIdentifier())
-        as! UITableViewSupplementaryViewType
+      let tableView = context.coordinator.tableView
+      let reuseIdentifier = _reuseIdentifier()
+      tableView.register(
+        SupplementaryView.self,
+        forCellReuseIdentifier: reuseIdentifier
+      )
+      return tableView
+        .dequeueReusableHeaderFooterView(withIdentifier: reuseIdentifier)
+        as! SupplementaryView
     }
     self._updateUITableViewSupplementaryView = { view, context in
+      let view = view as! SupplementaryView
       view.updateUI(
         with: content,
         context: Content.Context(
@@ -42,12 +51,12 @@ public struct UITableViewSupplementary<UIViewType: UIView> {
   }
 
   public func makeUITableViewSupplementaryView(context: Context)
-  -> UITableViewSupplementaryViewType {
-    UITableViewSupplementaryViewType()
+  -> UITableViewSupplementaryView {
+    _makeUITableViewSupplementaryView(context)
   }
   
   public func updateUITableViewSupplementaryView(
-    _ view: UITableViewSupplementaryViewType,
+    _ view: UITableViewSupplementaryView,
     context: Context
   ) {
     _updateUITableViewSupplementaryView(view, context)
@@ -61,16 +70,14 @@ extension UITableViewSupplementary: UITableViewSupplementaryRegistration {
     _reuseIdentifier()
   }
   
-  public var supplementaryType: UITableViewHeaderFooterView.Type {
-    UITableViewSupplementaryViewType.self
+  public var supplementaryType: UITableViewSupplementaryView.Type {
+    _supplementaryViewType()
   }
 }
 
 // MARK: - Helpers
 
 extension UITableViewSupplementary {
-  public typealias UITableViewSupplementaryViewType
-    = UITableViewSupplementaryBridgeView<UIViewType>
   public typealias Context = UIViewRepresentableContext<Coordinator>
   
   public struct Coordinator {
@@ -81,3 +88,5 @@ extension UITableViewSupplementary {
     }
   }
 }
+
+public typealias UITableViewSupplementaryView = UITableViewHeaderFooterView

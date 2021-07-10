@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		B07F25922699D1AE00E1E6C7 /* ContactListController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B07F25912699D1AE00E1E6C7 /* ContactListController.swift */; };
 		B0BC33E22699337D00B6E995 /* DemoApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0BC33E12699337D00B6E995 /* DemoApp.swift */; };
 		B0BC33E42699337D00B6E995 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0BC33E32699337D00B6E995 /* ContentView.swift */; };
 		B0BC33E62699337F00B6E995 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B0BC33E52699337F00B6E995 /* Assets.xcassets */; };
@@ -15,6 +16,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		B07F25912699D1AE00E1E6C7 /* ContactListController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactListController.swift; sourceTree = "<group>"; };
 		B0BC33DE2699337D00B6E995 /* Demo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Demo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		B0BC33E12699337D00B6E995 /* DemoApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DemoApp.swift; sourceTree = "<group>"; };
 		B0BC33E32699337D00B6E995 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -59,6 +61,7 @@
 				B0BC33F12699368100B6E995 /* tiny-uikit */,
 				B0BC33E12699337D00B6E995 /* DemoApp.swift */,
 				B0BC33E32699337D00B6E995 /* ContentView.swift */,
+				B07F25912699D1AE00E1E6C7 /* ContactListController.swift */,
 				B0BC33E52699337F00B6E995 /* Assets.xcassets */,
 				B0BC33EA2699337F00B6E995 /* Info.plist */,
 				B0BC33E72699337F00B6E995 /* Preview Content */,
@@ -154,6 +157,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				B0BC33E42699337D00B6E995 /* ContentView.swift in Sources */,
+				B07F25922699D1AE00E1E6C7 /* ContactListController.swift in Sources */,
 				B0BC33E22699337D00B6E995 /* DemoApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

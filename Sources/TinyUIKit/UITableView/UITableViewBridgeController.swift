@@ -13,7 +13,7 @@ open class UITableViewBridgeController<Coordinator>: UITableViewController {
   
   public var sections: [Section] = []
   
-  public override init(style: UITableView.Style) {
+  public override init(style: UITableView.Style = .plain) {
     super.init(style: style)
     self.setUp()
   }
@@ -47,8 +47,6 @@ open class UITableViewBridgeController<Coordinator>: UITableViewController {
     cellForRowAt indexPath: IndexPath
   ) -> UITableViewCell {
     let item = sections[indexPath.section].items[AnyIndex(indexPath.row)]
-    tableView.register(item)
-    
     let context = Item.Context(
       coordinator: Item.Coordinator(tableView: tableView, indexPath: indexPath),
       environment: environment
@@ -83,8 +81,6 @@ open class UITableViewBridgeController<Coordinator>: UITableViewController {
     viewForHeaderInSection section: Int
   ) -> UIView? {
     guard let header = sections[section].header else { return nil }
-    tableView.register(header)
-    
     let context = Supplementary.Context(
       coordinator: Supplementary.Coordinator(tableView: tableView),
       environment: environment
@@ -108,8 +104,6 @@ open class UITableViewBridgeController<Coordinator>: UITableViewController {
     viewForFooterInSection section: Int
   ) -> UIView? {
     guard let footer = sections[section].footer else { return nil }
-    tableView.register(footer)
-    
     let context = Supplementary.Context(
       coordinator: Supplementary.Coordinator(tableView: tableView),
       environment: environment
@@ -124,8 +118,8 @@ open class UITableViewBridgeController<Coordinator>: UITableViewController {
 // MARK: - Helpers
 
 extension UITableViewBridgeController {
-  public typealias Item = UITableViewRow<UIView>
-  public typealias Supplementary = UITableViewSupplementary<UIView>
+  public typealias Item = UITableViewRow
+  public typealias Supplementary = UITableViewSupplementary
   
   public struct Section {
     public var header: Supplementary?

@@ -22,10 +22,6 @@ public protocol UIViewRepresentable {
 
 // MARK: - Helpers
 
-public extension UIViewRepresentable {
-  var reuseIdentifier: String { String(describing: type(of: self)) }
-}
-
 public extension UIViewRepresentable where Coordinator == Void {
   func makeCoordinator() -> Coordinator { () }
 }

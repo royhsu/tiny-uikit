@@ -7,25 +7,33 @@
 
 import UIKit
 
-public struct UITableViewRow<UIViewType: UIView> {
+public struct UITableViewRow {
   private let _reuseIdentifier: () -> String
-  private let _makeUITableViewCell: (Context) -> UITableViewCellType
-  private let _updateUITableViewCell: (UITableViewCellType, Context) -> Void
+  private let _cellType: () -> UITableViewCell.Type
+  private let _makeUITableViewCell: (Context) -> UITableViewCell
+  private let _updateUITableViewCell: (UITableViewCell, Context) -> Void
   public var onSelect: (() -> Void)?
   
   public init<Content: UIViewRepresentable>(
     content: Content,
     onSelect: (() -> Void)? = nil
-  ) where Content.UIViewType == UIViewType {
-    let _reuseIdentifier = { String(describing: UITableViewCellType.self) }
+  ) {
+    typealias Cell = UITableViewBridgeCell<Content.UIViewType>
+    
+    let _reuseIdentifier = { String(describing: Cell.self) }
     self._reuseIdentifier = _reuseIdentifier
+    self._cellType = { Cell.self }
     self._makeUITableViewCell = { context in
-      context.coordinator.tableView.dequeueReusableCell(
-        withIdentifier: _reuseIdentifier(),
+      let tableView = context.coordinator.tableView
+      let reuseIdentifier = _reuseIdentifier()
+      tableView.register(Cell.self, forCellReuseIdentifier: reuseIdentifier)
+      return tableView.dequeueReusableCell(
+        withIdentifier: reuseIdentifier,
         for: context.coordinator.indexPath
-      ) as! UITableViewCellType
+      ) as! Cell
     }
     self._updateUITableViewCell = { cell, context in
+      let cell = cell as! Cell
       cell.updateUI(
         with: content,
         context: Content.Context(
@@ -37,12 +45,12 @@ public struct UITableViewRow<UIViewType: UIView> {
     self.onSelect = onSelect
   }
   
-  public func makeUITableViewCell(context: Context) -> UITableViewCellType {
+  public func makeUITableViewCell(context: Context) -> UITableViewCell {
     _makeUITableViewCell(context)
   }
 
   public func updateUITableViewCell(
-    _ cell: UITableViewCellType,
+    _ cell: UITableViewCell,
     context: Context
   ) {
     _updateUITableViewCell(cell, context)
@@ -57,14 +65,13 @@ extension UITableViewRow: UITableViewCellRegistration {
   }
   
   public var cellType: UITableViewCell.Type {
-    UITableViewCellType.self
+    _cellType()
   }
 }
 
 // MARK: - Helpers
 
 public extension UITableViewRow {
-  typealias UITableViewCellType = UITableViewBridgeCell<UIViewType>
   typealias Context = UIViewRepresentableContext<Coordinator>
   
   struct Coordinator {

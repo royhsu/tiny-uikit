@@ -7,26 +7,35 @@
 
 import UIKit
 
-public struct UICollectionViewItem<UIViewType: UIView> {
+public struct UICollectionViewItem {
   private let _reuseIdentifier: () -> String
-  private let _makeUICollectionViewCell: (Context) -> UICollectionViewCellType
+  private let _cellType: () -> UICollectionViewCell.Type
+  private let _makeUICollectionViewCell: (Context) -> UICollectionViewCell
   private let _updateUICollectionViewCell
-    : (UICollectionViewCellType, Context) -> Void
+    : (UICollectionViewCell, Context) -> Void
   public var onSelect: (() -> Void)?
   
   public init<Content: UIViewRepresentable>(
     content: Content,
     onSelect: (() -> Void)? = nil
-  ) where Content.UIViewType == UIViewType {
-    let _reuseIdentifier = { String(describing: UICollectionViewCellType.self) }
+  ) {
+    typealias Cell = UICollectionViewBridgeCell<Content.UIViewType>
+    
+    let _reuseIdentifier = { String(describing: Cell.self) }
     self._reuseIdentifier = _reuseIdentifier
+    self._cellType = { Cell.self }
     self._makeUICollectionViewCell = { context in
-      context.coordinator.collectionView.dequeueReusableCell(
-        withReuseIdentifier: _reuseIdentifier(),
+      let collectionView = context.coordinator.collectionView
+      let reuseIdentifier = _reuseIdentifier()
+      collectionView
+        .register(Cell.self, forCellWithReuseIdentifier: reuseIdentifier)
+      return collectionView.dequeueReusableCell(
+        withReuseIdentifier: reuseIdentifier,
         for: context.coordinator.indexPath
-      ) as! UICollectionViewCellType
+      ) as! Cell
     }
     self._updateUICollectionViewCell = { cell, context in
+      let cell = cell as! Cell
       cell.updateUI(
         with: content,
         context: Content.Context(
@@ -39,12 +48,12 @@ public struct UICollectionViewItem<UIViewType: UIView> {
   }
   
   public func makeUICollectionViewCell(context: Context)
-  -> UICollectionViewCellType {
+  -> UICollectionViewCell {
     _makeUICollectionViewCell(context)
   }
 
   public func updateUICollectionViewCell(
-    _ cell: UICollectionViewCellType,
+    _ cell: UICollectionViewCell,
     context: Context
   ) {
     _updateUICollectionViewCell(cell, context)
@@ -59,12 +68,11 @@ extension UICollectionViewItem: UICollectionViewCellRegistration {
   }
 
   public var cellType: UICollectionViewCell.Type {
-    UICollectionViewCellType.self
+    _cellType()
   }
 }
 
 public extension UICollectionViewItem {
-  typealias UICollectionViewCellType = UICollectionViewBridgeCell<UIViewType>
   typealias Context = UIViewRepresentableContext<Coordinator>
   
   struct Coordinator {
