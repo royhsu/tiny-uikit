@@ -16,8 +16,7 @@ public struct UITableViewRow<UIViewType: UIView> {
   public init<Content: UIViewRepresentable>(
     content: Content,
     onSelect: (() -> Void)? = nil
-  )
-  where Content.UIViewType == UIViewType {
+  ) where Content.UIViewType == UIViewType {
     let _reuseIdentifier = { String(describing: UITableViewCellType.self) }
     self._reuseIdentifier = _reuseIdentifier
     self._makeUITableViewCell = { context in

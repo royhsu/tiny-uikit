@@ -59,36 +59,3 @@ public struct AnyUIViewRepresentable<UIViewType: UIView, Coordinator> {
     _makeCoordinator()
   }
 }
-
-#warning("TODO: [Priority: high] unused. (cell)")
-@available(*, deprecated)
-public struct AnyTypeErasedUIViewRepresentable<Coordinator>
-: UIViewRepresentable
-{
-  public typealias Context = UIViewRepresentableContext<Coordinator>
-  private let _makeUIView: (Context) -> UIView
-  private let _updateUIView: (UIView, Context) -> Void
-  private let _makeCoordinator: () -> Coordinator
-
-  public init<Value: UIViewRepresentable>(_ value: Value)
-  where Value.Coordinator == Coordinator
-  {
-    self._makeUIView = value.makeUIView
-    self._updateUIView = { view, context in
-      value.updateUIView(view as! Value.UIViewType, context: context)
-    }
-    self._makeCoordinator = value.makeCoordinator
-  }
-
-  public func makeUIView(context: Context) -> UIView {
-    _makeUIView(context)
-  }
-
-  public func updateUIView(_ view: UIView, context: Context) {
-    _updateUIView(view, context)
-  }
-
-  public func makeCoordinator() -> Coordinator {
-    _makeCoordinator()
-  }
-}

@@ -9,5 +9,6 @@ import UIKit
 
 public protocol UICollectionViewCellRegistration {
   var reuseIdentifier: String { get }
+  
   var cellType: UICollectionViewCell.Type { get }
 }

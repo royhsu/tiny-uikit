@@ -7,19 +7,24 @@
 
 import UIKit
 
-public final class UICollectionViewBridgeCell<Value: UIViewRepresentable>
+public final class UICollectionViewBridgeCell<UIViewType: UIView>
 : UICollectionViewCell {
-  private(set) var bridgeView: Value.UIViewType?
+  private(set) var bridgeView: UIViewType?
 
-  override public func prepareForReuse() {
+  public override func prepareForReuse() {
     super.prepareForReuse()
     let reusableView = bridgeView as? Reusable
     reusableView?.prepareForReuse()
   }
 }
 
+// MARK: - Helpers
+
 public extension UICollectionViewBridgeCell {
-  func updateUI(with value: Value, context: Value.Context) {
+  func updateUI<Value: UIViewRepresentable>(
+    with value: Value,
+    context: Value.Context
+  ) where Value.UIViewType == UIViewType {
     if let bridgeView = bridgeView , bridgeView.superview === contentView {
       value.updateUIView(bridgeView, context: context)
     } else {

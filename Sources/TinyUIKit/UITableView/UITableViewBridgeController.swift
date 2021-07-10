@@ -5,7 +5,6 @@
 //  Created by Roy Hsu on 2021/6/16.
 //
 
-import TinyUIKit
 import UIKit
 
 open class UITableViewBridgeController<Coordinator>: UITableViewController {
