@@ -7,33 +7,58 @@
 
 import UIKit
 
-public struct UITableViewRow<Value: UIViewRepresentable>:
-  UITableViewCellRepresentable
-{
-  public var value: Value
-  /// We don't want the default implementation since `Value` may have already been type-erased from
-  /// caller.
-  public var reuseIdentifier: String { value.reuseIdentifier }
-
-  public init(value: Value) {
-    self.value = value
+public struct UITableViewRow<UIViewType: UIView> {
+  public let reuseIdentifier: String
+  private let _makeUITableViewCell: (Context) -> UITableViewCellType
+  private let _updateUITableViewCell: (UITableViewCellType, Context) -> Void
+  
+  public init<Value: UIViewRepresentable>(
+    reuseIdentifier: String,
+    value: Value
+  )
+  where Value.UIViewType == UIViewType {
+    self.reuseIdentifier = reuseIdentifier
+    self._makeUITableViewCell = { context in
+      context.coordinator.tableView.dequeueReusableCell(
+        withIdentifier: reuseIdentifier,
+        for: context.coordinator.indexPath
+      ) as! UITableViewCellType
+    }
+    self._updateUITableViewCell = { cell, context in
+      cell.updateUI(
+        with: value,
+        context: Value.Context(
+          coordinator: value.makeCoordinator(),
+          environment: context.environment
+        )
+      )
+    }
+  }
+  
+  public func makeUITableViewCell(context: Context) -> UITableViewCellType {
+    _makeUITableViewCell(context)
   }
 
-  public func updateUICell(_ cell: Cell, context: Context) {
-    cell.updateUI(
-      with: value,
-      context: .init(
-        coordinator: value.makeCoordinator(),
-        environment: context.environment
-      )
-    )
+  public func updateUITableViewCell(
+    _ cell: UITableViewCellType,
+    context: Context
+  ) {
+    _updateUITableViewCell(cell, context)
   }
 }
 
-// MARK: - Cell
+// MARK: - UITableViewCellRegistration
+
+extension UITableViewRow: UITableViewCellRegistration {
+  public var cellType: UITableViewCell.Type {
+    UITableViewCellType.self
+  }
+}
+
+// MARK: - Helpers
 
 public extension UITableViewRow {
-  typealias Cell = UITableViewBridgeCell<Value>
-
-  var cellType: UITableViewCell.Type { Cell.self }
+  typealias UITableViewCellType = UITableViewBridgeCell<UIViewType>
+  typealias Coordinator = UITableViewCellCoordinator
+  typealias Context = UIViewRepresentableContext<Coordinator>
 }

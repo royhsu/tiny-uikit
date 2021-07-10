@@ -9,5 +9,6 @@ import UIKit
 
 public protocol UITableViewCellRegistration {
   var reuseIdentifier: String { get }
+  
   var cellType: UITableViewCell.Type { get }
 }

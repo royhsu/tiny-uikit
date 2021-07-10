@@ -6,7 +6,7 @@ let package = Package(
   platforms: [.iOS(.v9)],
   products: [.library(name: "TinyUIKit", targets: ["TinyUIKit"])],
   targets: [
-    .target(name: "TinyUIKit"),
+    .target(name: "TinyUIKit", exclude: ["Demos"]),
     .testTarget(name: "TinyUIKitTests", dependencies: ["TinyUIKit"]),
   ]
 )

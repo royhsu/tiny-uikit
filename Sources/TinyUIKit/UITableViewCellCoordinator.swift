@@ -1,5 +1,5 @@
 //
-//  UITableViewCellRepresentableCoordinator.swift
+//  UITableViewCellCoordinator.swift
 //
 //
 //  Created by Roy Hsu on 2021/6/12.
@@ -7,7 +7,7 @@
 
 import UIKit
 
-public struct UITableViewCellRepresentableCoordinator {
+public struct UITableViewCellCoordinator {
   public var tableView: UITableView
   public var indexPath: IndexPath
 

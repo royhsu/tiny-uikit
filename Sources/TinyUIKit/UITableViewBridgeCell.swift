@@ -7,20 +7,25 @@
 
 import UIKit
 
-public final class UITableViewBridgeCell<Value: UIViewRepresentable>:
-  UITableViewCell
-{
-  private(set) var bridgeView: Value.View?
+public final class UITableViewBridgeCell<UIViewType: UIView>
+: UITableViewCell {
+  private(set) var bridgeView: UIViewType?
 
   override public func prepareForReuse() {
     super.prepareForReuse()
-    bridgeView?.prepareForReuse()
+    let reusableView = bridgeView as? Reusable
+    reusableView?.prepareForReuse()
   }
 }
 
+// MARK: - Helpers
+
 public extension UITableViewBridgeCell {
-  func updateUI(with value: Value, context: Value.Context) {
-    if let bridgeView = bridgeView {
+  func updateUI<Value: UIViewRepresentable>(
+    with value: Value,
+    context: Value.Context
+  ) where Value.UIViewType == UIViewType {
+    if let bridgeView = bridgeView, bridgeView.superview === contentView {
       value.updateUIView(bridgeView, context: context)
     } else {
       let newView = value.makeUIView(context: context)

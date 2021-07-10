@@ -8,24 +8,19 @@
 import UIKit
 
 public protocol UIViewRepresentable {
-  associatedtype View: UIReusableView
+  associatedtype UIViewType: UIView
   associatedtype Coordinator = Void
   typealias Context = UIViewRepresentableContext<Coordinator>
 
-  /// UICollectionView/UITableView can leverage this reuse identifier when registering/dequeuing cells.
-  ///
-  /// Default implementation provided.
-  /// Default implementation uses the type description of instance itself. Beware of not using
-  /// type-erasured `View` if you want to use the default implementation.
-  var reuseIdentifier: String { get }
+  func makeUIView(context: Context) -> UIViewType
 
-  func makeUIView(context: Context) -> View
-
-  func updateUIView(_ view: View, context: Context)
+  func updateUIView(_ view: UIViewType, context: Context)
 
   /// Default implementation provided when `Coordinator` is Void.
   func makeCoordinator() -> Coordinator
 }
+
+// MARK: - Helpers
 
 public extension UIViewRepresentable {
   var reuseIdentifier: String { String(describing: type(of: self)) }
@@ -37,35 +32,58 @@ public extension UIViewRepresentable where Coordinator == Void {
 
 // MARK: - AnyUIViewRepresentable
 
-public struct AnyUIViewRepresentable<View: UIReusableView, Coordinator>:
-  UIViewRepresentable
-{
+public struct AnyUIViewRepresentable<UIViewType: UIView, Coordinator> {
   public typealias Context = UIViewRepresentableContext<Coordinator>
-
-  private let _reuseIdentifier: () -> String
-  private let _makeView: (Context) -> UIReusableView
-  private let _updateView: (UIReusableView, Context) -> Void
+  
+  private let _makeUIView: (Context) -> UIViewType
+  private let _updateUIView: (UIViewType, Context) -> Void
   private let _makeCoordinator: () -> Coordinator
 
   public init<Value: UIViewRepresentable>(_ value: Value)
-    where Value.View == View, Value.Coordinator == Coordinator
+  where Value.UIViewType == UIViewType, Value.Coordinator == Coordinator
   {
-    self._reuseIdentifier = { value.reuseIdentifier }
-    self._makeView = value.makeUIView
-    self._updateView = { view, context in
-      value.updateUIView(view as! View, context: context)
+    self._makeUIView = value.makeUIView
+    self._updateUIView = value.updateUIView
+    self._makeCoordinator = value.makeCoordinator
+  }
+
+  public func makeUIView(context: Context) -> UIViewType {
+    _makeUIView(context)
+  }
+
+  public func updateUIView(_ view: UIViewType, context: Context) {
+    _updateUIView(view, context)
+  }
+
+  public func makeCoordinator() -> Coordinator {
+    _makeCoordinator()
+  }
+}
+
+public struct AnyTypeErasedUIViewRepresentable<Coordinator>
+: UIViewRepresentable
+{
+  public typealias Context = UIViewRepresentableContext<Coordinator>
+  private let _makeUIView: (Context) -> UIView
+  private let _updateUIView: (UIView, Context) -> Void
+  private let _makeCoordinator: () -> Coordinator
+  
+  public init<Value: UIViewRepresentable>(_ value: Value)
+  where Value.Coordinator == Coordinator
+  {
+    self._makeUIView = value.makeUIView
+    self._updateUIView = { view, context in
+      value.updateUIView(view as! Value.UIViewType, context: context)
     }
     self._makeCoordinator = value.makeCoordinator
   }
 
-  public var reuseIdentifier: String { _reuseIdentifier() }
-
-  public func makeUIView(context: Context) -> UIReusableView {
-    _makeView(context)
+  public func makeUIView(context: Context) -> UIView {
+    _makeUIView(context)
   }
 
-  public func updateUIView(_ view: UIReusableView, context: Context) {
-    _updateView(view, context)
+  public func updateUIView(_ view: UIView, context: Context) {
+    _updateUIView(view, context)
   }
 
   public func makeCoordinator() -> Coordinator {
