@@ -5,39 +5,40 @@
 //  Created by Roy Hsu on 2021/6/22.
 //
 
-import TinyUIKit
 import UIKit
 
 public struct UITableViewSupplementary<UIViewType: UIView> {
-  public let reuseIdentifier: String
+  private let _reuseIdentifier: () -> String
   private let _makeUITableViewSupplementaryView
-    : (Context) -> UIViewType
+    : (Context) -> UITableViewSupplementaryViewType
   private let _updateUITableViewSupplementaryView
     : (UITableViewSupplementaryViewType, Context) -> Void
+  public var onSelect: (() -> Void)?
   
-  public init<Value: UIViewRepresentable>(
-    reuseIdentifier: String,
-    value: Value
+  public init<Content: UIViewRepresentable>(
+    content: Content,
+    onSelect: (() -> Void)? = nil
   )
-  where Value.UIViewType == UIViewType {
-    self.reuseIdentifier = reuseIdentifier
+  where Content.UIViewType == UIViewType {
+    let _reuseIdentifier = {
+      String(describing: UITableViewSupplementaryViewType.self)
+    }
+    self._reuseIdentifier = _reuseIdentifier
     self._makeUITableViewSupplementaryView = { context in
-      value.makeUIView(
-        context: Value.Context(
-          coordinator: value.makeCoordinator(),
-          environment: context.environment
-        )
-      )
+      context.coordinator.tableView
+        .dequeueReusableHeaderFooterView(withIdentifier: _reuseIdentifier())
+        as! UITableViewSupplementaryViewType
     }
     self._updateUITableViewSupplementaryView = { view, context in
       view.updateUI(
-        with: value,
-        context: Value.Context(
-          coordinator: value.makeCoordinator(),
+        with: content,
+        context: Content.Context(
+          coordinator: content.makeCoordinator(),
           environment: context.environment
         )
       )
     }
+    self.onSelect = onSelect
   }
 
   public func makeUITableViewSupplementaryView(context: Context)
@@ -50,6 +51,18 @@ public struct UITableViewSupplementary<UIViewType: UIView> {
     context: Context
   ) {
     _updateUITableViewSupplementaryView(view, context)
+  }
+}
+
+// MARK: - UITableViewSupplementaryRegistration
+
+extension UITableViewSupplementary: UITableViewSupplementaryRegistration {
+  public var reuseIdentifier: String {
+    _reuseIdentifier()
+  }
+  
+  public var supplementaryType: UITableViewHeaderFooterView.Type {
+    UITableViewSupplementaryViewType.self
   }
 }
 

@@ -5,14 +5,13 @@
 //  Created by Roy Hsu on 2021/6/22.
 //
 
-import TinyUIKit
 import UIKit
 
 public final class UITableViewSupplementaryBridgeView
-<UIViewType: UIView>: UIView {
+<UIViewType: UIView>: UITableViewHeaderFooterView {
   private(set) var bridgeView: UIViewType?
   
-  public func prepareForReuse() {
+  public override func prepareForReuse() {
     let reusableView = bridgeView as? Reusable
     reusableView?.prepareForReuse()
   }

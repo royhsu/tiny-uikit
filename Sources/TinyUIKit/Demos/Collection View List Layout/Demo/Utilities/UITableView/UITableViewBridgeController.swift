@@ -8,34 +8,26 @@
 import TinyUIKit
 import UIKit
 
-public final class UITableViewBridgeController<Coordinator>
-: UITableViewController {
-  private var environment: UIEnvironmentValues {
-    UIEnvironmentValues(traitCollection: traitCollection)
-  }
-  public var sections: [Section] {
-    didSet {
-      guard isViewLoaded else { return }
-      registerAllCells()
-    }
-  }
-
-  public init(sections: [Section] = []) {
-    self.sections = sections
-    super.init(style: .plain)
+open class UITableViewBridgeController<Coordinator>: UITableViewController {
+  
+  // MARK: Data Source
+  
+  public var sections: [Section] = []
+  
+  public override init(style: UITableView.Style) {
+    super.init(style: style)
+    self.setUp()
   }
 
   public required init?(coder: NSCoder) {
-    self.sections = []
     super.init(coder: coder)
+    self.setUp()
   }
-
+  
   // MARK: View Lifecycle
 
-  public override func viewDidLoad() {
-    super.viewDidLoad()
+  private func setUp() {
     tableView.separatorStyle = .none
-    registerAllCells()
   }
 
   // MARK: UITableViewDataSource
@@ -56,13 +48,16 @@ public final class UITableViewBridgeController<Coordinator>
     cellForRowAt indexPath: IndexPath
   ) -> UITableViewCell {
     let item = sections[indexPath.section].items[AnyIndex(indexPath.row)]
-    let context = Item.Content.Context(
-      coordinator: .init(tableView: tableView, indexPath: indexPath),
+    tableView.register(item)
+    
+    let context = Item.Context(
+      coordinator: Item.Coordinator(tableView: tableView, indexPath: indexPath),
       environment: environment
     )
-    let cell = item.content.makeUITableViewCell(context: context)
+    let cell = item.makeUITableViewCell(context: context)
     cell.selectionStyle = .none
-    item.content.updateUITableViewCell(cell, context: context)
+    item.updateUITableViewCell(cell, context: context)
+    
     return cell
   }
 
@@ -73,7 +68,7 @@ public final class UITableViewBridgeController<Coordinator>
     didSelectRowAt indexPath: IndexPath
   ) {
     let item = sections[indexPath.section].items[AnyIndex(indexPath.row)]
-    item.onSelect()
+    item.onSelect?()
   }
 
   public override func tableView(
@@ -89,12 +84,15 @@ public final class UITableViewBridgeController<Coordinator>
     viewForHeaderInSection section: Int
   ) -> UIView? {
     guard let header = sections[section].header else { return nil }
-    let context = Supplementary.Content.Context(
-      coordinator: Supplementary.Content.Coordinator(tableView: tableView),
+    tableView.register(header)
+    
+    let context = Supplementary.Context(
+      coordinator: Supplementary.Coordinator(tableView: tableView),
       environment: environment
     )
-    let view = header.content.makeUITableViewSupplementaryView(context: context)
-    header.content.updateUITableViewSupplementaryView(view, context: context)
+    let view = header.makeUITableViewSupplementaryView(context: context)
+    header.updateUITableViewSupplementaryView(view, context: context)
+    
     return view
   }
 
@@ -111,31 +109,30 @@ public final class UITableViewBridgeController<Coordinator>
     viewForFooterInSection section: Int
   ) -> UIView? {
     guard let footer = sections[section].footer else { return nil }
-    let context = Supplementary.Content.Context(
-      coordinator: .init(tableView: tableView),
+    tableView.register(footer)
+    
+    let context = Supplementary.Context(
+      coordinator: Supplementary.Coordinator(tableView: tableView),
       environment: environment
     )
-    let view = footer.content.makeUITableViewSupplementaryView(context: context)
-    footer.content.updateUITableViewSupplementaryView(view, context: context)
+    let view = footer.makeUITableViewSupplementaryView(context: context)
+    footer.updateUITableViewSupplementaryView(view, context: context)
+    
     return view
   }
 }
 
-extension UITableViewBridgeController {
-  private func registerAllCells() {
-    UITableViewCellRegistrationManager(tableView: tableView)
-      .registerAll(sections.flatMap(\.items).map(\.content))
-  }
-}
-
-// MARK: - Section
+// MARK: - Helpers
 
 extension UITableViewBridgeController {
+  public typealias Item = UITableViewRow<UIView>
+  public typealias Supplementary = UITableViewSupplementary<UIView>
+  
   public struct Section {
     public var header: Supplementary?
     public var items: AnyCollection<Item>
     public var footer: Supplementary?
-    #warning("TODO: [Priority: high] header/footer registration. (my learning)")
+    
     public init<C: Collection>(
       header: Supplementary? = nil,
       items: C,
@@ -146,46 +143,8 @@ extension UITableViewBridgeController {
       self.footer = footer
     }
   }
-}
-
-// MARK: - Item
-
-extension UITableViewBridgeController {
-  public struct Item {
-    public var content: Content
-    public var onSelect: () -> Void
-
-    public init<T: UIViewRepresentable>(
-      content: T,
-      onSelect: @escaping () -> Void = {}
-    ) where T.UIViewType: Reusable, T.Coordinator == Coordinator {
-      self.content = Content(
-        reuseIdentifier: content.reuseIdentifier,
-        value: AnyTypeErasedUIViewRepresentable(content)
-      )
-      self.onSelect = onSelect
-    }
-
-    public typealias Content = UITableViewRow<UIView>
-  }
-}
-
-// MARK: - Supplementary
-
-extension UITableViewBridgeController {
-  public struct Supplementary {
-    public var content: Content
-
-    public init<T: UIViewRepresentable>(
-      content: T,
-      onSelect: @escaping () -> Void = {}
-    ) where T.UIViewType: Reusable, T.Coordinator == Coordinator {
-      self.content = Content(
-        reuseIdentifier: content.reuseIdentifier,
-        value: AnyTypeErasedUIViewRepresentable(content)
-      )
-    }
-
-    public typealias Content = UITableViewSupplementary<UIView>
+  
+  private var environment: UIEnvironmentValues {
+    UIEnvironmentValues(traitCollection: traitCollection)
   }
 }

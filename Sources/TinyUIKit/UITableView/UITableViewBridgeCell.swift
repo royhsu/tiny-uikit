@@ -7,11 +7,10 @@
 
 import UIKit
 
-public final class UITableViewBridgeCell<UIViewType: UIView>
-: UITableViewCell {
+public final class UITableViewBridgeCell<UIViewType: UIView>: UITableViewCell {
   private(set) var bridgeView: UIViewType?
 
-  override public func prepareForReuse() {
+  public override func prepareForReuse() {
     super.prepareForReuse()
     let reusableView = bridgeView as? Reusable
     reusableView?.prepareForReuse()

@@ -18,7 +18,7 @@ public struct UIViewRepresentableContext<Coordinator> {
   }
 }
 
-// MARK: - Environment
+// MARK: - Helpers
 
 public extension UIViewRepresentableContext {
   typealias Environment = UIEnvironmentValues

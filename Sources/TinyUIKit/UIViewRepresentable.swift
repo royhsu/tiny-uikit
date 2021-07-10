@@ -60,6 +60,8 @@ public struct AnyUIViewRepresentable<UIViewType: UIView, Coordinator> {
   }
 }
 
+#warning("TODO: [Priority: high] unused. (cell)")
+@available(*, deprecated)
 public struct AnyTypeErasedUIViewRepresentable<Coordinator>
 : UIViewRepresentable
 {
@@ -67,7 +69,7 @@ public struct AnyTypeErasedUIViewRepresentable<Coordinator>
   private let _makeUIView: (Context) -> UIView
   private let _updateUIView: (UIView, Context) -> Void
   private let _makeCoordinator: () -> Coordinator
-  
+
   public init<Value: UIViewRepresentable>(_ value: Value)
   where Value.Coordinator == Coordinator
   {

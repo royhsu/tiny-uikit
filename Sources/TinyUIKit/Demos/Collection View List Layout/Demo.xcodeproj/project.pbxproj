@@ -14,8 +14,6 @@
 		B0BC33F42699368D00B6E995 /* TinyUIKit in Frameworks */ = {isa = PBXBuildFile; productRef = B0BC33F32699368D00B6E995 /* TinyUIKit */; };
 		B0BC33FC269936F800B6E995 /* UICollectionViewBridgeController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0BC33F7269936F800B6E995 /* UICollectionViewBridgeController.swift */; };
 		B0BC33FD269936F800B6E995 /* UITableViewBridgeController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0BC33F9269936F800B6E995 /* UITableViewBridgeController.swift */; };
-		B0BC33FE269936F800B6E995 /* UITableViewSupplementaryBridgeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0BC33FA269936F800B6E995 /* UITableViewSupplementaryBridgeView.swift */; };
-		B0BC33FF269936F800B6E995 /* UITableViewSupplementary.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0BC33FB269936F800B6E995 /* UITableViewSupplementary.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -28,8 +26,6 @@
 		B0BC33F12699368100B6E995 /* tiny-uikit */ = {isa = PBXFileReference; lastKnownFileType = folder; name = "tiny-uikit"; path = ../../../../..; sourceTree = "<group>"; };
 		B0BC33F7269936F800B6E995 /* UICollectionViewBridgeController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UICollectionViewBridgeController.swift; sourceTree = "<group>"; };
 		B0BC33F9269936F800B6E995 /* UITableViewBridgeController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UITableViewBridgeController.swift; sourceTree = "<group>"; };
-		B0BC33FA269936F800B6E995 /* UITableViewSupplementaryBridgeView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UITableViewSupplementaryBridgeView.swift; sourceTree = "<group>"; };
-		B0BC33FB269936F800B6E995 /* UITableViewSupplementary.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UITableViewSupplementary.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -111,8 +107,6 @@
 			isa = PBXGroup;
 			children = (
 				B0BC33F9269936F800B6E995 /* UITableViewBridgeController.swift */,
-				B0BC33FA269936F800B6E995 /* UITableViewSupplementaryBridgeView.swift */,
-				B0BC33FB269936F800B6E995 /* UITableViewSupplementary.swift */,
 			);
 			path = UITableView;
 			sourceTree = "<group>";
@@ -189,8 +183,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				B0BC33FE269936F800B6E995 /* UITableViewSupplementaryBridgeView.swift in Sources */,
-				B0BC33FF269936F800B6E995 /* UITableViewSupplementary.swift in Sources */,
 				B0BC33E42699337D00B6E995 /* ContentView.swift in Sources */,
 				B0BC33FC269936F800B6E995 /* UICollectionViewBridgeController.swift in Sources */,
 				B0BC33FD269936F800B6E995 /* UITableViewBridgeController.swift in Sources */,
