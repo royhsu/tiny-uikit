@@ -8,7 +8,7 @@
 import UIKit
 
 open class UICollectionViewBridgeController<Coordinator>
-: UICollectionViewController {
+: UICollectionViewController, UICollectionViewDelegateFlowLayout {
   
   // MARK: Data Source
   
@@ -47,7 +47,6 @@ open class UICollectionViewBridgeController<Coordinator>
     cellForItemAt indexPath: IndexPath
   ) -> UICollectionViewCell {
     let item = sections[indexPath.section].items[AnyIndex(indexPath.row)]
-    collectionView.register(item)
     
     let context = Item.Context(
       coordinator: Item.Coordinator(
@@ -71,6 +70,42 @@ open class UICollectionViewBridgeController<Coordinator>
     let item = sections[indexPath.section].items[AnyIndex(indexPath.row)]
     item.onSelect?()
   }
+  
+  // MARK: UICollectionViewDelegateFlowLayout
+  
+//  public func collectionView(
+//    _ collectionView: UICollectionView,
+//    layout collectionViewLayout: UICollectionViewLayout,
+//    estimatedSizeForItemAt indexPath: IndexPath
+//  ) -> CGSize {
+//    let item = sections[indexPath.section].items[AnyIndex(indexPath.row)]
+//    let context = Item.Context(
+//      coordinator: Item.Coordinator(
+//        collectionView: collectionView,
+//        indexPath: indexPath
+//      ),
+//      environment: environment
+//    )
+//    let cell = item.makeUICollectionViewCell(context: context)
+//    return item.estimatedSizeProvider?(cell) ?? .zero
+//  }
+
+//  public func collectionView(
+//    _ collectionView: UICollectionView,
+//    layout collectionViewLayout: UICollectionViewLayout,
+//    sizeForItemAt indexPath: IndexPath
+//  ) -> CGSize {
+//    let item = sections[indexPath.section].items[AnyIndex(indexPath.row)]
+//    let context = Item.Context(
+//      coordinator: Item.Coordinator(
+//        collectionView: collectionView,
+//        indexPath: indexPath
+//      ),
+//      environment: environment
+//    )
+//    let cell = item.makeUICollectionViewCell(context: context)
+//    return item.sizeProvider?(cell) ?? CGSize(width: 44.0, height: 44.0)
+//  }
 }
 
 // MARK: - Helpers

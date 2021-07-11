@@ -17,6 +17,7 @@ public struct UICollectionViewItem {
   
   public init<Content: UIViewRepresentable>(
     content: Content,
+    size: UICollectionViewLayoutSize? = nil,
     onSelect: (() -> Void)? = nil
   ) {
     typealias Cell = UICollectionViewBridgeCell<Content.UIViewType>
@@ -36,8 +37,20 @@ public struct UICollectionViewItem {
     }
     self._updateUICollectionViewCell = { cell, context in
       let cell = cell as! Cell
+      let layoutInfoProvider: LayoutInfoProvider?
+      if let size = size {
+        layoutInfoProvider = {
+          let collectionView = context.coordinator.collectionView
+          let containerRect = collectionView.bounds
+            .inset(by: collectionView.layoutMargins)
+          return (containerRect.size, size)
+        }
+      } else {
+        layoutInfoProvider = nil
+      }
       cell.updateUI(
         with: content,
+        layoutInfoProvider: layoutInfoProvider,
         context: Content.Context(
           coordinator: content.makeCoordinator(),
           environment: context.environment
@@ -72,8 +85,12 @@ extension UICollectionViewItem: UICollectionViewCellRegistration {
   }
 }
 
+// MARK: - Helpers
+
 public extension UICollectionViewItem {
   typealias Context = UIViewRepresentableContext<Coordinator>
+  typealias LayoutInfoProvider
+    = () -> (containerSize: CGSize, itemSize: UICollectionViewLayoutSize)
   
   struct Coordinator {
     public var collectionView: UICollectionView
