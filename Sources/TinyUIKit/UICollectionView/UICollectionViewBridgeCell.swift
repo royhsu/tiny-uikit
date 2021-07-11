@@ -28,6 +28,7 @@ public final class UICollectionViewBridgeCell<UIViewType: UIView>
   public override func preferredLayoutAttributesFitting(
     _ layoutAttributes: UICollectionViewLayoutAttributes
   ) -> UICollectionViewLayoutAttributes {
+    #warning("TODO: [Priority: high] interitem spacings aren't handled. (cell)")
     let newAttributes = super.preferredLayoutAttributesFitting(layoutAttributes)
     NSLayoutConstraint.deactivate(
       [
@@ -42,8 +43,8 @@ public final class UICollectionViewBridgeCell<UIViewType: UIView>
     let width: CGFloat
     let height: CGFloat
     defer {
-      newAttributes.bounds.size.width = width
-      newAttributes.bounds.size.height = height
+      newAttributes.bounds.size.width = ceil(width)
+      newAttributes.bounds.size.height = ceil(height)
     }
     switch (itemSize.widthDimension, itemSize.heightDimension) {
     case (.absolute, .absolute):

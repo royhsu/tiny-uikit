@@ -23,11 +23,92 @@ final class ContactListController: UIViewController {
     contentViewController.collectionView.layoutMargins = .zero
     contentViewController.sections = [
       .init(items: [
+//        .init(
+//          content: UIContactRow(),
+//          size: UICollectionViewLayoutSize(
+//            width: 200.0,
+//            height: 100.0
+//          )
+//        ),
         .init(
           content: UIContactRow(),
           size: UICollectionViewLayoutSize(
-            width: 200.0,
-            height: 100.0
+            width: 0.3,
+            widthDimension: .fractionalWidth,
+            height: 44.0,
+            heightDimension: .estimated
+          )
+        ),
+        .init(
+          content: UIContactRow(),
+          size: UICollectionViewLayoutSize(
+            width: 0.3,
+            widthDimension: .fractionalWidth,
+            height: 44.0,
+            heightDimension: .estimated
+          )
+        ),
+        .init(
+          content: UIContactRow(),
+          size: UICollectionViewLayoutSize(
+            width: 0.3,
+            widthDimension: .fractionalWidth,
+            height: 44.0,
+            heightDimension: .estimated
+          )
+        ),
+        .init(
+          content: UIContactRow(),
+          size: UICollectionViewLayoutSize(
+            width: 1.0,
+            widthDimension: .fractionalWidth,
+            height: 44.0,
+            heightDimension: .estimated
+          )
+        ),
+        .init(
+          content: UIContactRow(),
+          size: UICollectionViewLayoutSize(
+            width: 1.0,
+            widthDimension: .fractionalWidth,
+            height: 44.0,
+            heightDimension: .estimated
+          )
+        ),
+        .init(
+          content: UIContactRow(),
+          size: UICollectionViewLayoutSize(
+            width: 1.0,
+            widthDimension: .fractionalWidth,
+            height: 44.0,
+            heightDimension: .estimated
+          )
+        ),
+        .init(
+          content: UIContactRow(),
+          size: UICollectionViewLayoutSize(
+            width: 1.0,
+            widthDimension: .fractionalWidth,
+            height: 44.0,
+            heightDimension: .estimated
+          )
+        ),
+        .init(
+          content: UIContactRow(),
+          size: UICollectionViewLayoutSize(
+            width: 1.0,
+            widthDimension: .fractionalWidth,
+            height: 44.0,
+            heightDimension: .estimated
+          )
+        ),
+        .init(
+          content: UIContactRow(),
+          size: UICollectionViewLayoutSize(
+            width: 1.0,
+            widthDimension: .fractionalWidth,
+            height: 44.0,
+            heightDimension: .estimated
           )
         ),
         .init(
