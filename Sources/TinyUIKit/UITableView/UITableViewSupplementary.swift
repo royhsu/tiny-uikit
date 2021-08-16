@@ -14,10 +14,12 @@ public struct UITableViewSupplementary {
     : (Context) -> UITableViewSupplementaryView
   private let _updateUITableViewSupplementaryView
     : (UITableViewSupplementaryView, Context) -> Void
+  public var onWillAppear: ((UIView) -> Void)?
   public var onSelect: (() -> Void)?
   
   public init<Content: UIViewRepresentable>(
     content: Content,
+    onWillAppear: ((UIView) -> Void)? = nil,
     onSelect: (() -> Void)? = nil
   ) {
     typealias SupplementaryView
@@ -31,7 +33,7 @@ public struct UITableViewSupplementary {
       let reuseIdentifier = _reuseIdentifier()
       tableView.register(
         SupplementaryView.self,
-        forCellReuseIdentifier: reuseIdentifier
+        forHeaderFooterViewReuseIdentifier: reuseIdentifier
       )
       return tableView
         .dequeueReusableHeaderFooterView(withIdentifier: reuseIdentifier)
@@ -47,6 +49,7 @@ public struct UITableViewSupplementary {
         )
       )
     }
+    self.onWillAppear = onWillAppear
     self.onSelect = onSelect
   }
 

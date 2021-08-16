@@ -43,6 +43,7 @@ public final class UICollectionViewBridgeCell<UIViewType: UIView>
     let width: CGFloat
     let height: CGFloat
     defer {
+      // Use ceil to get pixel-perfect values without content being trancated.
       newAttributes.bounds.size.width = ceil(width)
       newAttributes.bounds.size.height = ceil(height)
     }

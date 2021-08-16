@@ -13,11 +13,13 @@ public struct UICollectionViewItem {
   private let _makeUICollectionViewCell: (Context) -> UICollectionViewCell
   private let _updateUICollectionViewCell
     : (UICollectionViewCell, Context) -> Void
+  public var onWillAppear: (() -> Void)?
   public var onSelect: (() -> Void)?
   
   public init<Content: UIViewRepresentable>(
     content: Content,
     size: UICollectionViewLayoutSize? = nil,
+    onWillAppear: (() -> Void)? = nil,
     onSelect: (() -> Void)? = nil
   ) {
     typealias Cell = UICollectionViewBridgeCell<Content.UIViewType>
@@ -57,6 +59,7 @@ public struct UICollectionViewItem {
         )
       )
     }
+    self.onWillAppear = onWillAppear
     self.onSelect = onSelect
   }
   

@@ -1,14 +1,14 @@
 //
-//  UITableViewSupplementaryBridgeView.swift
+//  UICollectionViewSupplementaryBridgeView.swift
 //  
 //
-//  Created by Roy Hsu on 2021/6/22.
+//  Created by Roy Hsu on 2021/7/11.
 //
 
 import UIKit
 
-public final class UITableViewSupplementaryBridgeView
-<UIViewType: UIView>: UITableViewHeaderFooterView {
+public final class UICollectionViewSupplementaryBridgeView
+<UIViewType: UIView>: UICollectionReusableView {
   private(set) var bridgeView: UIViewType?
   
   public override func prepareForReuse() {
@@ -19,7 +19,7 @@ public final class UITableViewSupplementaryBridgeView
 
 // MARK: - Helpers
 
-extension UITableViewSupplementaryBridgeView {
+extension UICollectionViewSupplementaryBridgeView {
   func updateUI<Value: UIViewRepresentable>(
     with value: Value,
     context: Value.Context

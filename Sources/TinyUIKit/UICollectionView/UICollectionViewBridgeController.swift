@@ -47,7 +47,6 @@ open class UICollectionViewBridgeController<Coordinator>
     cellForItemAt indexPath: IndexPath
   ) -> UICollectionViewCell {
     let item = sections[indexPath.section].items[AnyIndex(indexPath.row)]
-    
     let context = Item.Context(
       coordinator: Item.Coordinator(
         collectionView: collectionView,
@@ -57,7 +56,6 @@ open class UICollectionViewBridgeController<Coordinator>
     )
     let cell = item.makeUICollectionViewCell(context: context)
     item.updateUICollectionViewCell(cell, context: context)
-    
     return cell
   }
   
@@ -70,6 +68,87 @@ open class UICollectionViewBridgeController<Coordinator>
     let item = sections[indexPath.section].items[AnyIndex(indexPath.row)]
     item.onSelect?()
   }
+  
+//  public func collectionView(
+//    _ collectionView: UICollectionView,
+//    layout collectionViewLayout: UICollectionViewLayout,
+//    referenceSizeForHeaderInSection sectionIndex: Int
+//  ) -> CGSize {
+//    let section = sections[sectionIndex]
+//    guard let header = section.header, !section.items.isEmpty else {
+//      return .zero
+//    }
+//    return CGSize(width: 100.0, height: 100.0)
+//    let firstItemIndexPath = IndexPath(item: 0, section: sectionIndex)
+//    let headerView = collectionView.supplementaryView(forElementKind: header.elementKind, at: firstItemIndexPath)
+//    let headerView = self.collectionView(
+//      collectionView,
+//      viewForSupplementaryElementOfKind: header.elementKind,
+//      at: firstItemIndexPath
+//    )
+//    return headerView
+//      .systemLayoutSizeFitting(UIView.layoutFittingCompressedSize)
+//  }
+  
+  #warning("TODO: [Priority: high] handle layout size for header. (header)")
+  #warning("TODO: [Priority: high] handle layout size for footer. (header)")
+  
+//  public override func collectionView(
+//    _ collectionView: UICollectionView,
+//    viewForSupplementaryElementOfKind kind: String,
+//    at indexPath: IndexPath
+//  ) -> UICollectionReusableView {
+//    print(#function, indexPath)
+//    if kind == UICollectionView.elementKindSectionHeader {
+//      let view = collectionView.dequeueReusableSupplementaryView(
+//        ofKind: UICollectionView.elementKindSectionHeader,
+//        withReuseIdentifier: "Header",
+//        for: indexPath
+//      ) as! BlueView
+//      view.translatesAutoresizingMaskIntoConstraints = false
+//      let containerSize = collectionView.bounds
+//        .inset(by: collectionView.layoutMargins)
+//      view.preferredMaxLayoutWidth = containerSize.width
+//      return view
+//    } else {
+//      fatalError()
+//    }
+//    let section = sections[indexPath.section]
+//    let context = UICollectionViewSupplementary.Context(
+//      coordinator: UICollectionViewSupplementary.Coordinator(
+//        collectionView: collectionView,
+//        indexPath: indexPath
+//      ),
+//      environment: environment
+//    )
+//    if let header = section.header, header.elementKind == kind {
+//      let headerView = header
+//        .makeUICollectionViewSupplementaryView(context: context)
+//      header
+//        .updateUICollectionViewSupplementaryView(headerView, context: context)
+//      return headerView
+//    } else if let footer = section.footer, footer.elementKind == kind {
+//      let footerView = footer
+//        .makeUICollectionViewSupplementaryView(context: context)
+//      footer
+//        .updateUICollectionViewSupplementaryView(footerView, context: context)
+//      return footerView
+//    } else if let decoration
+//      = section.decorations.first(where: { $0.elementKind == kind }) {
+//      let decorationView = decoration
+//        .makeUICollectionViewSupplementaryView(context: context)
+//      decoration.updateUICollectionViewSupplementaryView(
+//        decorationView,
+//        context: context
+//      )
+//      return decorationView
+//    } else {
+//      assertionFailure("Unknown supplementary kind: \(kind)")
+//      let invisibleView = UICollectionReusableView()
+//      invisibleView.frame = .zero
+//      return invisibleView
+//    }
+//  }
   
   // MARK: UICollectionViewDelegateFlowLayout
   
@@ -112,13 +191,24 @@ open class UICollectionViewBridgeController<Coordinator>
 
 extension UICollectionViewBridgeController {
   public typealias Item = UICollectionViewItem
+  public typealias Supplementary = UICollectionViewSupplementary
   
   public struct Section {
+    public var header: Supplementary?
     public var items: AnyCollection<Item>
+    public var footer: Supplementary?
+    public var decorations: [Supplementary]
     
-    public init<C: Collection>(items: C)
-    where C.Element == Item, C.Index == Int {
+    public init<C: Collection>(
+      header: Supplementary? = nil,
+      items: C,
+      footer: Supplementary? = nil,
+      decorations: [Supplementary]? = nil
+    ) where C.Element == Item, C.Index == Int {
+      self.header = header
       self.items = AnyCollection(items)
+      self.footer = footer
+      self.decorations = decorations ?? []
     }
   }
   

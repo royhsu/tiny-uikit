@@ -12,10 +12,12 @@ public struct UITableViewRow {
   private let _cellType: () -> UITableViewCell.Type
   private let _makeUITableViewCell: (Context) -> UITableViewCell
   private let _updateUITableViewCell: (UITableViewCell, Context) -> Void
+  public var onWillAppear: (() -> Void)?
   public var onSelect: (() -> Void)?
   
   public init<Content: UIViewRepresentable>(
     content: Content,
+    onWillAppear: (() -> Void)? = nil,
     onSelect: (() -> Void)? = nil
   ) {
     typealias Cell = UITableViewBridgeCell<Content.UIViewType>
@@ -42,6 +44,7 @@ public struct UITableViewRow {
         )
       )
     }
+    self.onWillAppear = onWillAppear
     self.onSelect = onSelect
   }
   

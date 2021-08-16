@@ -59,6 +59,28 @@ open class UITableViewBridgeController<Coordinator>: UITableViewController {
   }
 
   // MARK: UITableViewDelegate
+  
+  open override func tableView(
+    _ tableView: UITableView,
+    willDisplayHeaderView view: UIView,
+    forSection section: Int
+  ) {
+    guard section < sections.count else { return }
+    let section = sections[section]
+    section.header?.onWillAppear?(view)
+  }
+
+  open override func tableView(
+    _ tableView: UITableView,
+    willDisplay cell: UITableViewCell,
+    forRowAt indexPath: IndexPath
+  ) {
+    guard indexPath.section < sections.count else { return }
+    let items = sections[indexPath.section].items
+    guard indexPath.item < items.count else { return }
+    let item = items[AnyIndex(indexPath.row)]
+    item.onWillAppear?()
+  }
 
   public override func tableView(
     _ tableView: UITableView,
@@ -122,15 +144,18 @@ extension UITableViewBridgeController {
   public typealias Supplementary = UITableViewSupplementary
   
   public struct Section {
+    public var id: String
     public var header: Supplementary?
     public var items: AnyCollection<Item>
     public var footer: Supplementary?
     
     public init<C: Collection>(
+      id: String? = nil,
       header: Supplementary? = nil,
       items: C,
       footer: Supplementary? = nil
     ) where C.Element == Item, C.Index == Int {
+      self.id = id ?? UUID().uuidString
       self.header = header
       self.items = AnyCollection(items)
       self.footer = footer
