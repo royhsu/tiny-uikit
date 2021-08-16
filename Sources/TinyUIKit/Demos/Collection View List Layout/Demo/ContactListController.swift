@@ -1,0 +1,366 @@
+//
+//  ContactListController.swift
+//  Demo
+//
+//  Created by Roy Hsu on 2021/7/10.
+//
+
+import TinyUIKit
+import UIKit
+
+final class ContactListController: UIViewController {
+//  private let contentViewController = UITableViewBridgeController<Void>()
+  private let listLayout: UICollectionViewFlowLayout = {
+//    let layout = ListLayout()
+    let layout = UICollectionViewFlowLayout()
+    layout.estimatedItemSize = UICollectionViewFlowLayout.automaticSize
+    layout.sectionHeadersPinToVisibleBounds = true
+    return layout
+  }()
+  private lazy var contentViewController =
+    UICollectionViewBridgeController<Void>(collectionViewLayout: listLayout)
+  
+  override func viewDidLoad() {
+    super.viewDidLoad()
+    
+    let collectionView = contentViewController.collectionView
+    
+//    collectionView?.register(BlueView.self, forSupplementaryViewOfKind: "ListLayout.Background", withReuseIdentifier: "Background")
+    collectionView?.register(
+      BlueView.self,
+      forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader,
+      withReuseIdentifier: "Header"
+    )
+    
+    contentViewController.collectionView.layoutMargins = .zero
+    contentViewController.sections = [
+      .init(
+        header: UICollectionViewSupplementary(
+          content: UIContactListHeader(),
+          elementKind: UICollectionView.elementKindSectionHeader
+        ),
+        items: [
+//        .init(
+//          content: UIContactRow(),
+//          size: UICollectionViewLayoutSize(
+//            width: 200.0,
+//            height: 100.0
+//          )
+//        ),
+          .init(
+            content: UIContactRow(),
+            size: UICollectionViewLayoutSize(
+              width: 0.3,
+              widthDimension: .fractionalWidth,
+              height: 44.0,
+              heightDimension: .estimated
+            )
+          ),
+          .init(
+            content: UIContactRow(),
+            size: UICollectionViewLayoutSize(
+              width: 0.3,
+              widthDimension: .fractionalWidth,
+              height: 44.0,
+              heightDimension: .estimated
+            )
+          ),
+          .init(
+            content: UIContactRow(),
+            size: UICollectionViewLayoutSize(
+              width: 0.3,
+              widthDimension: .fractionalWidth,
+              height: 44.0,
+              heightDimension: .estimated
+            )
+          ),
+          .init(
+            content: UIContactRow(),
+            size: UICollectionViewLayoutSize(
+              width: 1.0,
+              widthDimension: .fractionalWidth,
+              height: 44.0,
+              heightDimension: .estimated
+            )
+          ),
+          .init(
+            content: UIContactRow(),
+            size: UICollectionViewLayoutSize(
+              width: 1.0,
+              widthDimension: .fractionalWidth,
+              height: 44.0,
+              heightDimension: .estimated
+            )
+          ),
+          .init(
+            content: UIContactRow(),
+            size: UICollectionViewLayoutSize(
+              width: 1.0,
+              widthDimension: .fractionalWidth,
+              height: 44.0,
+              heightDimension: .estimated
+            )
+          ),
+          .init(
+            content: UIContactRow(),
+            size: UICollectionViewLayoutSize(
+              width: 1.0,
+              widthDimension: .fractionalWidth,
+              height: 44.0,
+              heightDimension: .estimated
+            )
+          ),
+          .init(
+            content: UIContactRow(),
+            size: UICollectionViewLayoutSize(
+              width: 1.0,
+              widthDimension: .fractionalWidth,
+              height: 44.0,
+              heightDimension: .estimated
+            )
+          ),
+          .init(
+            content: UIContactRow(),
+            size: UICollectionViewLayoutSize(
+              width: 1.0,
+              widthDimension: .fractionalWidth,
+              height: 44.0,
+              heightDimension: .estimated
+            )
+          ),
+          .init(
+            content: UIContactRow(),
+            size: UICollectionViewLayoutSize(
+              width: 1.0,
+              widthDimension: .fractionalWidth,
+              height: 44.0,
+              heightDimension: .estimated
+            )
+          ),
+          .init(
+            content: UIContactRow(),
+            size: UICollectionViewLayoutSize(
+              width: 140.0,
+              height: 60.0
+            )
+          ),
+          .init(
+            content: UIContactRow(),
+            size: UICollectionViewLayoutSize(
+              width: 140.0,
+              height: 60.0
+            )
+          ),
+          .init(content: UIContactRow()),
+          .init(content: UIContactRow()),
+          .init(content: UIContactRow()),
+          .init(content: UIContactRow()),
+  //        .init(content: UIContactNameTextField()),
+          .init(content: UIContactRow()),
+  //        .init(content: UIContactNameTextField()),
+          .init(content: UIContactRow()),
+        ]
+      )
+    ]
+//    contentViewController.tableView.reloadData()
+    contentViewController.collectionView.backgroundColor = .white
+    contentViewController.collectionView.reloadData()
+    
+    addChild(contentViewController)
+    
+    let contentView = contentViewController.view!
+    
+    // Layout.
+    contentView.translatesAutoresizingMaskIntoConstraints = false
+    view.addSubview(contentView)
+    NSLayoutConstraint.activate([
+      // Horizontal.
+      contentView.leadingAnchor
+        .constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
+      contentView.trailingAnchor
+        .constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
+      
+      // Vertical.
+      contentView.topAnchor
+        .constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+      contentView.bottomAnchor
+        .constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
+    ])
+    
+    contentViewController.didMove(toParent: self)
+  }
+  
+  override func viewWillTransition(
+    to size: CGSize,
+    with coordinator: UIViewControllerTransitionCoordinator
+  ) {
+    super.viewWillTransition(to: size, with: coordinator)
+    coordinator.animate { context in
+      self.contentViewController.collectionViewLayout.invalidateLayout()
+    } completion: { context in }
+  }
+}
+
+struct UIContactRow: UIViewRepresentable {
+  func makeUIView(context: Context) -> UILabel {
+    UILabel()
+  }
+  
+  func updateUIView(_ label: UILabel, context: Context) {
+    label.text = "Katherine\nKatherine\nKatherine\nKatherine"
+    label.numberOfLines = 0
+    label.backgroundColor = .red
+  }
+  
+  typealias Coordinator = Void
+}
+
+struct UIContactNameTextField: UIViewRepresentable {
+  func makeUIView(context: Context) -> UITextField {
+    UITextField()
+  }
+  
+  func updateUIView(_ textField: UITextField, context: Context) {
+    textField.borderStyle = .roundedRect
+  }
+  
+  typealias Coordinator = Void
+}
+
+struct UIContactListHeader: UIViewRepresentable {
+  func makeUIView(context: Context) -> UILabel {
+    UILabel()
+  }
+  
+  func updateUIView(_ label: UILabel, context: Context) {
+    label.text = "Header\nHeader\nHeader"
+    label.numberOfLines = 0
+    label.backgroundColor = .yellow
+  }
+  
+  typealias Coordinator = Void
+}
+
+//final class ListLayout: UICollectionViewFlowLayout {
+//  static let elementKindSectionBackground = "ListLayout.Background"
+//
+//  private struct SectionBackgroundDecoration {
+//    var layoutAttributes: UICollectionViewLayoutAttributes
+//  }
+//
+//  private typealias SectionIndex = Int
+//  private var sectionBackgroundDecorationInfo
+//    : [SectionIndex: SectionBackgroundDecoration] = [:]
+//
+//  override func prepare() {
+//    super.prepare()
+//    #warning("TODO: [Priority: high] potential performance bottle neck when scrolling. (layout)")
+//    sectionBackgroundDecorationInfo = [:]
+//    guard let collectionView = collectionView else { return }
+//    let numberOfSections = collectionView.numberOfSections
+//    for sectionIndex in 0..<numberOfSections {
+//      let numberOfItems = collectionView.numberOfItems(inSection: sectionIndex)
+//      let firstIndexPathInSection = IndexPath(item: 0, section: sectionIndex)
+//      guard let firstItemAttributes
+//              = layoutAttributesForItem(at: firstIndexPathInSection)
+//      else { continue }
+//      let newDecoration = SectionBackgroundDecoration(
+//        layoutAttributes: UICollectionViewLayoutAttributes(
+//          forDecorationViewOfKind: Self.elementKindSectionBackground,
+//          with: firstIndexPathInSection
+//        )
+//      )
+//      print("numberOfItems", numberOfItems)
+//      print("Screen.bound", UIScreen.main.bounds)
+//      let lastItemIndex = numberOfItems - 1
+//      let lastItemIndexPath
+//        = IndexPath(item: lastItemIndex, section: sectionIndex)
+//      if lastItemIndex > 1,
+//         let lastItemAttributes
+//           = layoutAttributesForItem(at: lastItemIndexPath) {
+//        print("firstItemAttributes", firstItemAttributes)
+//        print("lastItemAttributes", lastItemAttributes)
+//        let containerRect
+//          = collectionView.bounds.inset(by: collectionView.layoutMargins)
+//        newDecoration.layoutAttributes.zIndex = -1
+//        newDecoration.layoutAttributes.frame = CGRect(
+//          x: containerRect.minX,
+//          y: firstItemAttributes.frame.minY,
+//          width: containerRect.width,
+//          height: lastItemAttributes.frame.maxY - firstItemAttributes.frame.minY
+//        )
+//      } else {
+//        newDecoration.layoutAttributes.bounds = .zero
+//      }
+//      sectionBackgroundDecorationInfo[sectionIndex] = newDecoration
+//    }
+//    register(
+//      BlueView.self,
+//      forDecorationViewOfKind: Self.elementKindSectionBackground
+//    )
+//  }
+//
+//  override func layoutAttributesForElements(in rect: CGRect)
+//  -> [UICollectionViewLayoutAttributes]? {
+//    var currentAttributes = super.layoutAttributesForElements(in: rect)
+//    let attributesForVisibleBackgroundDecorations
+//      = sectionBackgroundDecorationInfo.compactMap {
+//        (sectionIndex, decoration) in
+//        decoration.layoutAttributes.frame.intersects(rect)
+//          ? decoration.layoutAttributes
+//          : nil
+//      }
+//    currentAttributes?
+//      .append(contentsOf: attributesForVisibleBackgroundDecorations)
+//    return currentAttributes
+//  }
+//
+//  override func layoutAttributesForDecorationView(
+//    ofKind elementKind: String,
+//    at indexPath: IndexPath
+//  ) -> UICollectionViewLayoutAttributes? {
+//    sectionBackgroundDecorationInfo[indexPath.section]?.layoutAttributes
+//  }
+//
+//  override func layoutAttributesForSupplementaryView(
+//    ofKind elementKind: String,
+//    at indexPath: IndexPath
+//  ) -> UICollectionViewLayoutAttributes? {
+//    super.layoutAttributesForSupplementaryView(
+//      ofKind: elementKind,
+//      at: indexPath
+//    )
+//  }
+//}
+
+public final class BlueView: UICollectionReusableView {
+  private lazy var widthConstraint
+    = widthAnchor.constraint(equalToConstant: preferredMaxLayoutWidth)
+  
+  var preferredMaxLayoutWidth: CGFloat = 44.0 {
+    didSet {
+      widthConstraint.constant = preferredMaxLayoutWidth
+      setNeedsLayout()
+    }
+  }
+  
+  override init(frame: CGRect) {
+    super.init(frame: frame)
+    backgroundColor = .blue
+    translatesAutoresizingMaskIntoConstraints = false
+    NSLayoutConstraint.activate([
+      widthConstraint,
+      heightAnchor.constraint(equalToConstant: 50.0),
+    ])
+  }
+  
+  required init?(coder: NSCoder) {
+    super.init(coder: coder)
+    backgroundColor = .blue
+    translatesAutoresizingMaskIntoConstraints = false
+    NSLayoutConstraint.activate([
+      widthConstraint,
+      heightAnchor.constraint(equalToConstant: 50.0),
+    ])
+  }
+}

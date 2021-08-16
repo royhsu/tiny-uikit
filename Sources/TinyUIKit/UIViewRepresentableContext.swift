@@ -1,6 +1,6 @@
 //
 //  UIViewRepresentableContext.swift
-//  
+//
 //
 //  Created by Roy Hsu on 2021/6/12.
 //
@@ -8,7 +8,7 @@
 public struct UIViewRepresentableContext<Coordinator> {
   public var coordinator: Coordinator
   public var environment: Environment
-  
+
   public init(
     coordinator: Coordinator,
     environment: Environment = Environment()
@@ -18,8 +18,8 @@ public struct UIViewRepresentableContext<Coordinator> {
   }
 }
 
-// MARK: - Environment
+// MARK: - Helpers
 
-extension UIViewRepresentableContext {
-  public typealias Environment = UIEnvironmentValues
+public extension UIViewRepresentableContext {
+  typealias Environment = UIEnvironmentValues
 }
