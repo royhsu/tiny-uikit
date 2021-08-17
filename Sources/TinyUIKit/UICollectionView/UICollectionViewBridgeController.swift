@@ -46,7 +46,14 @@ open class UICollectionViewBridgeController<Coordinator>
     _ collectionView: UICollectionView,
     cellForItemAt indexPath: IndexPath
   ) -> UICollectionViewCell {
-    let item = sections[indexPath.section].items[AnyIndex(indexPath.row)]
+    guard indexPath.section < sections.count else {
+      return UICollectionViewCell()
+    }
+    let section = sections[indexPath.section]
+    guard indexPath.item < section.items.count else {
+      return UICollectionViewCell()
+    }
+    let item = section.items[AnyIndex(indexPath.item)]
     let context = Item.Context(
       coordinator: Item.Coordinator(
         collectionView: collectionView,
@@ -65,7 +72,10 @@ open class UICollectionViewBridgeController<Coordinator>
     _ collectionView: UICollectionView,
     didSelectItemAt indexPath: IndexPath
   ) {
-    let item = sections[indexPath.section].items[AnyIndex(indexPath.row)]
+    guard indexPath.section < sections.count else { return }
+    let section = sections[indexPath.section]
+    guard indexPath.item < section.items.count else { return }
+    let item = section.items[AnyIndex(indexPath.item)]
     item.onSelect?()
   }
   
@@ -157,7 +167,7 @@ open class UICollectionViewBridgeController<Coordinator>
 //    layout collectionViewLayout: UICollectionViewLayout,
 //    estimatedSizeForItemAt indexPath: IndexPath
 //  ) -> CGSize {
-//    let item = sections[indexPath.section].items[AnyIndex(indexPath.row)]
+//    let item = sections[indexPath.section].items[AnyIndex(indexPath.item)]
 //    let context = Item.Context(
 //      coordinator: Item.Coordinator(
 //        collectionView: collectionView,
@@ -174,7 +184,7 @@ open class UICollectionViewBridgeController<Coordinator>
 //    layout collectionViewLayout: UICollectionViewLayout,
 //    sizeForItemAt indexPath: IndexPath
 //  ) -> CGSize {
-//    let item = sections[indexPath.section].items[AnyIndex(indexPath.row)]
+//    let item = sections[indexPath.section].items[AnyIndex(indexPath.item)]
 //    let context = Item.Context(
 //      coordinator: Item.Coordinator(
 //        collectionView: collectionView,

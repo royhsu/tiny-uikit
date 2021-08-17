@@ -46,7 +46,14 @@ open class UITableViewBridgeController<Coordinator>: UITableViewController {
     _ tableView: UITableView,
     cellForRowAt indexPath: IndexPath
   ) -> UITableViewCell {
-    let item = sections[indexPath.section].items[AnyIndex(indexPath.row)]
+    guard indexPath.section < sections.count else {
+      return UITableViewCell(style: .default, reuseIdentifier: nil)
+    }
+    let section = sections[indexPath.section]
+    guard indexPath.row < section.items.count else {
+      return UITableViewCell(style: .default, reuseIdentifier: nil)
+    }
+    let item = section.items[AnyIndex(indexPath.row)]
     let context = Item.Context(
       coordinator: Item.Coordinator(tableView: tableView, indexPath: indexPath),
       environment: environment
@@ -54,7 +61,6 @@ open class UITableViewBridgeController<Coordinator>: UITableViewController {
     let cell = item.makeUITableViewCell(context: context)
     cell.selectionStyle = .none
     item.updateUITableViewCell(cell, context: context)
-    
     return cell
   }
 
@@ -76,9 +82,9 @@ open class UITableViewBridgeController<Coordinator>: UITableViewController {
     forRowAt indexPath: IndexPath
   ) {
     guard indexPath.section < sections.count else { return }
-    let items = sections[indexPath.section].items
-    guard indexPath.item < items.count else { return }
-    let item = items[AnyIndex(indexPath.row)]
+    let section = sections[indexPath.section]
+    guard indexPath.row < section.items.count else { return }
+    let item = section.items[AnyIndex(indexPath.row)]
     item.onWillAppear?()
   }
 
@@ -86,7 +92,10 @@ open class UITableViewBridgeController<Coordinator>: UITableViewController {
     _ tableView: UITableView,
     didSelectRowAt indexPath: IndexPath
   ) {
-    let item = sections[indexPath.section].items[AnyIndex(indexPath.row)]
+    guard indexPath.section < sections.count else { return }
+    let section = sections[indexPath.section]
+    guard indexPath.row < section.items.count else { return }
+    let item = section.items[AnyIndex(indexPath.row)]
     item.onSelect?()
   }
 
@@ -94,22 +103,24 @@ open class UITableViewBridgeController<Coordinator>: UITableViewController {
     _ tableView: UITableView,
     heightForHeaderInSection section: Int
   ) -> CGFloat {
-    let header = sections[section].header
-    return header == nil ? 0.0 : UITableView.automaticDimension
+    guard section < sections.count else { return 0.0 }
+    let section = sections[section]
+    return (section.header == nil) ? 0.0 : UITableView.automaticDimension
   }
 
   public override func tableView(
     _ tableView: UITableView,
     viewForHeaderInSection section: Int
   ) -> UIView? {
-    guard let header = sections[section].header else { return nil }
+    guard section < sections.count else { return nil }
+    let section = sections[section]
+    guard let header = section.header else { return nil }
     let context = Supplementary.Context(
       coordinator: Supplementary.Coordinator(tableView: tableView),
       environment: environment
     )
     let view = header.makeUITableViewSupplementaryView(context: context)
     header.updateUITableViewSupplementaryView(view, context: context)
-    
     return view
   }
 
@@ -117,22 +128,24 @@ open class UITableViewBridgeController<Coordinator>: UITableViewController {
     _ tableView: UITableView,
     heightForFooterInSection section: Int
   ) -> CGFloat {
-    let footer = sections[section].footer
-    return footer == nil ? 0.0 : UITableView.automaticDimension
+    guard section < sections.count else { return 0.0 }
+    let section = sections[section]
+    return (section.footer == nil) ? 0.0 : UITableView.automaticDimension
   }
 
   public override func tableView(
     _ tableView: UITableView,
     viewForFooterInSection section: Int
   ) -> UIView? {
-    guard let footer = sections[section].footer else { return nil }
+    guard section < sections.count else { return nil }
+    let section = sections[section]
+    guard let footer = section.footer else { return nil }
     let context = Supplementary.Context(
       coordinator: Supplementary.Coordinator(tableView: tableView),
       environment: environment
     )
     let view = footer.makeUITableViewSupplementaryView(context: context)
     footer.updateUITableViewSupplementaryView(view, context: context)
-    
     return view
   }
 }
