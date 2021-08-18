@@ -70,6 +70,18 @@ open class UICollectionViewBridgeController<Coordinator>
   
   public override func collectionView(
     _ collectionView: UICollectionView,
+    willDisplay cell: UICollectionViewCell,
+    forItemAt indexPath: IndexPath
+  ) {
+    guard indexPath.section < sections.count else { return }
+    let section = sections[indexPath.section]
+    guard indexPath.item < section.items.count else { return }
+    let item = section.items[AnyIndex(indexPath.item)]
+    item.onWillAppear?()
+  }
+  
+  public override func collectionView(
+    _ collectionView: UICollectionView,
     didSelectItemAt indexPath: IndexPath
   ) {
     guard indexPath.section < sections.count else { return }

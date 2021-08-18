@@ -66,7 +66,7 @@ open class UITableViewBridgeController<Coordinator>: UITableViewController {
 
   // MARK: UITableViewDelegate
   
-  open override func tableView(
+  public override func tableView(
     _ tableView: UITableView,
     willDisplayHeaderView view: UIView,
     forSection section: Int
@@ -76,7 +76,7 @@ open class UITableViewBridgeController<Coordinator>: UITableViewController {
     section.header?.onWillAppear?(view)
   }
 
-  open override func tableView(
+  public override func tableView(
     _ tableView: UITableView,
     willDisplay cell: UITableViewCell,
     forRowAt indexPath: IndexPath
