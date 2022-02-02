@@ -16,13 +16,13 @@ public struct UITableViewRow {
   public var onSelect: (() -> Void)?
   
   public init<Content: UIViewRepresentable>(
+    reuseIdentifier reuseIdentifierProvider: (() -> String)? = nil,
     content: Content,
     onWillAppear: (() -> Void)? = nil,
     onSelect: (() -> Void)? = nil
   ) {
-    typealias Cell = UITableViewBridgeCell<Content.UIViewType>
-    
-    let _reuseIdentifier = { String(describing: Cell.self) }
+    let _reuseIdentifier = reuseIdentifierProvider
+      ?? { String(describing: Cell.self) }
     self._reuseIdentifier = _reuseIdentifier
     self._cellType = { Cell.self }
     self._makeUITableViewCell = { context in
@@ -46,6 +46,10 @@ public struct UITableViewRow {
     }
     self.onWillAppear = onWillAppear
     self.onSelect = onSelect
+    
+    // MARK: Helpers
+    
+    typealias Cell = UITableViewBridgeCell<Content.UIViewType>
   }
   
   public func makeUITableViewCell(context: Context) -> UITableViewCell {

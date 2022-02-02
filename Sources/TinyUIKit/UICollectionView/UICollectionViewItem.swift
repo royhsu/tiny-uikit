@@ -24,8 +24,6 @@ public struct UICollectionViewItem {
     onWillAppear: (() -> Void)? = nil,
     onSelect: (() -> Void)? = nil
   ) {
-    typealias Cell = UICollectionViewBridgeCell<Content.UIViewType>
-    
     let _reuseIdentifier = reuseIdentifierProvider
       ?? { String(describing: Cell.self) }
     self._reuseIdentifier = _reuseIdentifier
@@ -53,6 +51,10 @@ public struct UICollectionViewItem {
     self.sizeProvider = sizeProvider
     self.onWillAppear = onWillAppear
     self.onSelect = onSelect
+    
+    // MARK: Helpers
+    
+    typealias Cell = UICollectionViewBridgeCell<Content.UIViewType>
   }
   
   public func makeUICollectionViewCell(context: Context)
