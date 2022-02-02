@@ -61,7 +61,6 @@ open class UITableViewBridgeController<Coordinator>: UITableViewController {
     let cell = item.makeUITableViewCell(context: context)
     cell.selectionStyle = .none
     item.updateUITableViewCell(cell, context: context)
-    
     return cell
   }
 
@@ -122,7 +121,6 @@ open class UITableViewBridgeController<Coordinator>: UITableViewController {
     )
     let view = header.makeUITableViewSupplementaryView(context: context)
     header.updateUITableViewSupplementaryView(view, context: context)
-    
     return view
   }
 
@@ -148,7 +146,6 @@ open class UITableViewBridgeController<Coordinator>: UITableViewController {
     )
     let view = footer.makeUITableViewSupplementaryView(context: context)
     footer.updateUITableViewSupplementaryView(view, context: context)
-    
     return view
   }
 }
