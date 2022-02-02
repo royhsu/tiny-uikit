@@ -56,6 +56,7 @@ open class UICollectionViewBridgeController<Coordinator>
     let item = section.items[AnyIndex(indexPath.item)]
     let context = Item.Context(
       coordinator: Item.Coordinator(
+        cellUsage: .display,
         collectionView: collectionView,
         indexPath: indexPath
       ),
@@ -91,6 +92,7 @@ open class UICollectionViewBridgeController<Coordinator>
     item.onSelect?()
   }
   
+  #warning("TODO: [Priority: high] handle layout size for header. (header)")
 //  public func collectionView(
 //    _ collectionView: UICollectionView,
 //    layout collectionViewLayout: UICollectionViewLayout,
@@ -112,7 +114,6 @@ open class UICollectionViewBridgeController<Coordinator>
 //      .systemLayoutSizeFitting(UIView.layoutFittingCompressedSize)
 //  }
   
-  #warning("TODO: [Priority: high] handle layout size for header. (header)")
   #warning("TODO: [Priority: high] handle layout size for footer. (header)")
   
 //  public override func collectionView(
@@ -174,39 +175,28 @@ open class UICollectionViewBridgeController<Coordinator>
   
   // MARK: UICollectionViewDelegateFlowLayout
   
-//  public func collectionView(
-//    _ collectionView: UICollectionView,
-//    layout collectionViewLayout: UICollectionViewLayout,
-//    estimatedSizeForItemAt indexPath: IndexPath
-//  ) -> CGSize {
-//    let item = sections[indexPath.section].items[AnyIndex(indexPath.item)]
-//    let context = Item.Context(
-//      coordinator: Item.Coordinator(
-//        collectionView: collectionView,
-//        indexPath: indexPath
-//      ),
-//      environment: environment
-//    )
-//    let cell = item.makeUICollectionViewCell(context: context)
-//    return item.estimatedSizeProvider?(cell) ?? .zero
-//  }
-
-//  public func collectionView(
-//    _ collectionView: UICollectionView,
-//    layout collectionViewLayout: UICollectionViewLayout,
-//    sizeForItemAt indexPath: IndexPath
-//  ) -> CGSize {
-//    let item = sections[indexPath.section].items[AnyIndex(indexPath.item)]
-//    let context = Item.Context(
-//      coordinator: Item.Coordinator(
-//        collectionView: collectionView,
-//        indexPath: indexPath
-//      ),
-//      environment: environment
-//    )
-//    let cell = item.makeUICollectionViewCell(context: context)
-//    return item.sizeProvider?(cell) ?? CGSize(width: 44.0, height: 44.0)
-//  }
+  public func collectionView(
+    _ collectionView: UICollectionView,
+    layout collectionViewLayout: UICollectionViewLayout,
+    sizeForItemAt indexPath: IndexPath
+  ) -> CGSize {
+    let defaultSize = CGSize(width: 44.0, height: 44.0)
+    guard indexPath.section < sections.count else { return defaultSize }
+    let section = sections[indexPath.section]
+    guard indexPath.item < section.items.count else { return defaultSize }
+    let item = section.items[AnyIndex(indexPath.item)]
+    let context = Item.Context(
+      coordinator: Item.Coordinator(
+        cellUsage: .template,
+        collectionView: collectionView,
+        indexPath: indexPath
+      ),
+      environment: environment
+    )
+    let cell = item.makeUICollectionViewCell(context: context)
+    item.updateUICollectionViewCell(cell, context: context)
+    return item.sizeProvider?(cell, context) ?? defaultSize
+  }
 }
 
 // MARK: - Helpers
@@ -216,17 +206,20 @@ extension UICollectionViewBridgeController {
   public typealias Supplementary = UICollectionViewSupplementary
   
   public struct Section {
+    public var id: String
     public var header: Supplementary?
     public var items: AnyCollection<Item>
     public var footer: Supplementary?
     public var decorations: [Supplementary]
     
     public init<C: Collection>(
+      id: String? = nil,
       header: Supplementary? = nil,
       items: C,
       footer: Supplementary? = nil,
       decorations: [Supplementary]? = nil
     ) where C.Element == Item, C.Index == Int {
+      self.id = id ?? UUID().uuidString
       self.header = header
       self.items = AnyCollection(items)
       self.footer = footer
@@ -236,5 +229,28 @@ extension UICollectionViewBridgeController {
   
   private var environment: UIEnvironmentValues {
     UIEnvironmentValues(traitCollection: traitCollection)
+  }
+}
+
+extension UICollectionViewFlowLayout {
+  public var containerRect: CGRect {
+    guard let collectionView = collectionView else {
+      return .zero
+    }
+    return collectionView.frame.inset(by: sectionInset)
+  }
+  
+  /// The perferred item width for the given column count.
+  public func preferredItemWidth(columnCount: Int) -> CGFloat {
+    precondition(columnCount > 0)
+    let interitemSpacingCount = columnCount - 1
+    let totalSpacingForInteritems
+      = minimumInteritemSpacing * CGFloat(interitemSpacingCount)
+    let width
+      = (containerRect.width - totalSpacingForInteritems) / CGFloat(columnCount)
+    // Rounded for pixel-perfect point.
+    // Use rounded down value can also make sure the number of columns generated
+    // by collection view matches the `columnCount` argument.
+    return width.rounded(.down)
   }
 }

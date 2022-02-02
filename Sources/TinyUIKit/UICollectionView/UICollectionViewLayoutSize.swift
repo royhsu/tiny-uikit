@@ -7,6 +7,8 @@
 
 import CoreGraphics
 
+#warning("TODO: [Priority: high] add support for horizontal (constraints to height). (collection view)")
+#warning("TODO: [Priority: high] add support for size dimension. (width & height). (collection view)")
 public struct UICollectionViewLayoutSize {
   public var width: CGFloat
   /// Default is `.absolute`.

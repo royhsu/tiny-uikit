@@ -8,7 +8,7 @@
 import UIKit
 
 public final class UITableViewBridgeCell<UIViewType: UIView>: UITableViewCell {
-  private(set) var bridgeView: UIViewType?
+  private(set) weak var bridgeView: UIViewType?
 
   public override func prepareForReuse() {
     super.prepareForReuse()
@@ -19,12 +19,13 @@ public final class UITableViewBridgeCell<UIViewType: UIView>: UITableViewCell {
 
 // MARK: - Helpers
 
-public extension UITableViewBridgeCell {
-  func updateUI<Value: UIViewRepresentable>(
+extension UITableViewBridgeCell {
+   public func updateUI<Value: UIViewRepresentable>(
     with value: Value,
     context: Value.Context
   ) where Value.UIViewType == UIViewType {
-    if let bridgeView = bridgeView, bridgeView.superview === contentView {
+    if let bridgeView = bridgeView,
+       bridgeView.superview === contentView {
       value.updateUIView(bridgeView, context: context)
     } else {
       let newView = value.makeUIView(context: context)
