@@ -13,18 +13,21 @@ public struct UICollectionViewItem {
   private let _makeUICollectionViewCell: (Context) -> UICollectionViewCell
   private let _updateUICollectionViewCell
     : (UICollectionViewCell, Context) -> Void
+  public var sizeProvider: SizeProvider?
   public var onWillAppear: (() -> Void)?
   public var onSelect: (() -> Void)?
   
   public init<Content: UIViewRepresentable>(
+    reuseIdentifier reuseIdentifierProvider: (() -> String)? = nil,
     content: Content,
-    size: UICollectionViewLayoutSize? = nil,
+    sizeProvider: SizeProvider? = nil,
     onWillAppear: (() -> Void)? = nil,
     onSelect: (() -> Void)? = nil
   ) {
     typealias Cell = UICollectionViewBridgeCell<Content.UIViewType>
     
-    let _reuseIdentifier = { String(describing: Cell.self) }
+    let _reuseIdentifier = reuseIdentifierProvider
+      ?? { String(describing: Cell.self) }
     self._reuseIdentifier = _reuseIdentifier
     self._cellType = { Cell.self }
     self._makeUICollectionViewCell = { context in
@@ -39,26 +42,15 @@ public struct UICollectionViewItem {
     }
     self._updateUICollectionViewCell = { cell, context in
       let cell = cell as! Cell
-      let layoutInfoProvider: LayoutInfoProvider?
-      if let size = size {
-        layoutInfoProvider = {
-          let collectionView = context.coordinator.collectionView
-          let containerRect = collectionView.bounds
-            .inset(by: collectionView.layoutMargins)
-          return (containerRect.size, size)
-        }
-      } else {
-        layoutInfoProvider = nil
-      }
       cell.updateUI(
         with: content,
-        layoutInfoProvider: layoutInfoProvider,
         context: Content.Context(
           coordinator: content.makeCoordinator(),
           environment: context.environment
         )
       )
     }
+    self.sizeProvider = sizeProvider
     self.onWillAppear = onWillAppear
     self.onSelect = onSelect
   }
@@ -90,16 +82,18 @@ extension UICollectionViewItem: UICollectionViewCellRegistration {
 
 // MARK: - Helpers
 
-public extension UICollectionViewItem {
-  typealias Context = UIViewRepresentableContext<Coordinator>
-  typealias LayoutInfoProvider
-    = () -> (containerSize: CGSize, itemSize: UICollectionViewLayoutSize)
+extension UICollectionViewItem {
+  public typealias Context = UIViewRepresentableContext<Coordinator>
+  public typealias SizeProvider = (UICollectionViewCell, Context) -> CGSize?
   
-  struct Coordinator {
+  public struct Coordinator {
     public var collectionView: UICollectionView
     public var indexPath: IndexPath
 
-    public init(collectionView: UICollectionView, indexPath: IndexPath) {
+    public init(
+      collectionView: UICollectionView,
+      indexPath: IndexPath
+    ) {
       self.collectionView = collectionView
       self.indexPath = indexPath
     }

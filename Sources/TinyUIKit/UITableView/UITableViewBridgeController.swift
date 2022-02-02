@@ -9,7 +9,7 @@ import UIKit
 
 open class UITableViewBridgeController<Coordinator>: UITableViewController {
   
-  // MARK: Data Source
+  // MARK: States
   
   public var sections: [Section] = []
   
