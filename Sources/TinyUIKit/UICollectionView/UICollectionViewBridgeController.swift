@@ -10,7 +10,7 @@ import UIKit
 open class UICollectionViewBridgeController<Coordinator>
 : UICollectionViewController, UICollectionViewDelegateFlowLayout {
   
-  // MARK: Data Source
+  // MARK: States
   
   public var sections: [Section] = []
   
