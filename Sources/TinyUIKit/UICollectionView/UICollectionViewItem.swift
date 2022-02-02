@@ -31,19 +31,14 @@ public struct UICollectionViewItem {
     self._reuseIdentifier = _reuseIdentifier
     self._cellType = { Cell.self }
     self._makeUICollectionViewCell = { context in
-      switch context.coordinator.cellUsage {
-      case .template:
-        return Cell()
-      case .display:
-        let collectionView = context.coordinator.collectionView
-        let reuseIdentifier = _reuseIdentifier()
-        collectionView
-          .register(Cell.self, forCellWithReuseIdentifier: reuseIdentifier)
-        return collectionView.dequeueReusableCell(
-          withReuseIdentifier: reuseIdentifier,
-          for: context.coordinator.indexPath
-        ) as! Cell
-      }
+      let collectionView = context.coordinator.collectionView
+      let reuseIdentifier = _reuseIdentifier()
+      collectionView
+        .register(Cell.self, forCellWithReuseIdentifier: reuseIdentifier)
+      return collectionView.dequeueReusableCell(
+        withReuseIdentifier: reuseIdentifier,
+        for: context.coordinator.indexPath
+      ) as! Cell
     }
     self._updateUICollectionViewCell = { cell, context in
       let cell = cell as! Cell
@@ -92,19 +87,13 @@ extension UICollectionViewItem {
   public typealias SizeProvider = (UICollectionViewCell, Context) -> CGSize?
   
   public struct Coordinator {
-    public enum CellUsage {
-      case template, display
-    }
-    public var cellUsage: CellUsage
     public var collectionView: UICollectionView
     public var indexPath: IndexPath
 
     public init(
-      cellUsage: CellUsage,
       collectionView: UICollectionView,
       indexPath: IndexPath
     ) {
-      self.cellUsage = cellUsage
       self.collectionView = collectionView
       self.indexPath = indexPath
     }
