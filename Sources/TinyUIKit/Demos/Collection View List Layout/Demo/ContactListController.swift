@@ -13,156 +13,64 @@ final class ContactListController: UIViewController {
   private let listLayout: UICollectionViewFlowLayout = {
 //    let layout = ListLayout()
     let layout = UICollectionViewFlowLayout()
-    layout.estimatedItemSize = UICollectionViewFlowLayout.automaticSize
-    layout.sectionHeadersPinToVisibleBounds = true
+//    layout.estimatedItemSize = UICollectionViewFlowLayout.automaticSize
+    layout.itemSize = CGSize(width: 150.0, height: 150.0)
+//    layout.sectionHeadersPinToVisibleBounds = true
     return layout
   }()
+  private typealias Section = UICollectionViewBridgingController.Section
+  private typealias Item = UICollectionViewBridgingController.Item
   private lazy var contentViewController =
-    UICollectionViewBridgeController<Void>(collectionViewLayout: listLayout)
+    UICollectionViewBridgingController(collectionViewLayout: listLayout)
   
   override func viewDidLoad() {
     super.viewDidLoad()
     
-    let collectionView = contentViewController.collectionView
-    
-//    collectionView?.register(BlueView.self, forSupplementaryViewOfKind: "ListLayout.Background", withReuseIdentifier: "Background")
-    collectionView?.register(
-      BlueView.self,
-      forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader,
-      withReuseIdentifier: "Header"
-    )
-    
     contentViewController.collectionView.layoutMargins = .zero
     contentViewController.sections = [
-      .init(
+      Section(
         header: UICollectionViewSupplementary(
           content: UIContactListHeader(),
-          elementKind: UICollectionView.elementKindSectionHeader
+          size: { view, context in
+            view.systemLayoutSizeFitting(UIView.layoutFittingCompressedSize)
+          }
         ),
         items: [
-//        .init(
-//          content: UIContactRow(),
-//          size: UICollectionViewLayoutSize(
-//            width: 200.0,
-//            height: 100.0
-//          )
-//        ),
-          .init(
+          Item(
             content: UIContactRow(),
-            size: UICollectionViewLayoutSize(
-              width: 0.3,
-              widthDimension: .fractionalWidth,
-              height: 44.0,
-              heightDimension: .estimated
-            )
+            sizeProvider: .verticallyScrollingGridLayout(columnCount: 3)
           ),
-          .init(
+          Item(
             content: UIContactRow(),
-            size: UICollectionViewLayoutSize(
-              width: 0.3,
-              widthDimension: .fractionalWidth,
-              height: 44.0,
-              heightDimension: .estimated
-            )
+            sizeProvider: .verticallyScrollingGridLayout(columnCount: 3)
           ),
-          .init(
+          Item(
             content: UIContactRow(),
-            size: UICollectionViewLayoutSize(
-              width: 0.3,
-              widthDimension: .fractionalWidth,
-              height: 44.0,
-              heightDimension: .estimated
-            )
+            sizeProvider: .verticallyScrollingGridLayout(columnCount: 3)
           ),
-          .init(
+          Item(
             content: UIContactRow(),
-            size: UICollectionViewLayoutSize(
-              width: 1.0,
-              widthDimension: .fractionalWidth,
-              height: 44.0,
-              heightDimension: .estimated
-            )
+            sizeProvider: .listLayout
           ),
-          .init(
+          Item(
             content: UIContactRow(),
-            size: UICollectionViewLayoutSize(
-              width: 1.0,
-              widthDimension: .fractionalWidth,
-              height: 44.0,
-              heightDimension: .estimated
-            )
+            sizeProvider: { _, _ in CGSize(width: 200.0, height: 200.0) }
           ),
-          .init(
-            content: UIContactRow(),
-            size: UICollectionViewLayoutSize(
-              width: 1.0,
-              widthDimension: .fractionalWidth,
-              height: 44.0,
-              heightDimension: .estimated
-            )
-          ),
-          .init(
-            content: UIContactRow(),
-            size: UICollectionViewLayoutSize(
-              width: 1.0,
-              widthDimension: .fractionalWidth,
-              height: 44.0,
-              heightDimension: .estimated
-            )
-          ),
-          .init(
-            content: UIContactRow(),
-            size: UICollectionViewLayoutSize(
-              width: 1.0,
-              widthDimension: .fractionalWidth,
-              height: 44.0,
-              heightDimension: .estimated
-            )
-          ),
-          .init(
-            content: UIContactRow(),
-            size: UICollectionViewLayoutSize(
-              width: 1.0,
-              widthDimension: .fractionalWidth,
-              height: 44.0,
-              heightDimension: .estimated
-            )
-          ),
-          .init(
-            content: UIContactRow(),
-            size: UICollectionViewLayoutSize(
-              width: 1.0,
-              widthDimension: .fractionalWidth,
-              height: 44.0,
-              heightDimension: .estimated
-            )
-          ),
-          .init(
-            content: UIContactRow(),
-            size: UICollectionViewLayoutSize(
-              width: 140.0,
-              height: 60.0
-            )
-          ),
-          .init(
-            content: UIContactRow(),
-            size: UICollectionViewLayoutSize(
-              width: 140.0,
-              height: 60.0
-            )
-          ),
-          .init(content: UIContactRow()),
-          .init(content: UIContactRow()),
-          .init(content: UIContactRow()),
-          .init(content: UIContactRow()),
-  //        .init(content: UIContactNameTextField()),
-          .init(content: UIContactRow()),
-  //        .init(content: UIContactNameTextField()),
-          .init(content: UIContactRow()),
-        ]
+          Item(
+            content: UIContactRow()
+          )
+          .onSelect { _, _ in
+            print("Selected!!")
+          },
+        ],
+        footer: UICollectionViewSupplementary(
+          content: UIContactListHeader(),
+          size: { view, context in
+            view.systemLayoutSizeFitting(UIView.layoutFittingCompressedSize)
+          }
+        )
       )
     ]
-//    contentViewController.tableView.reloadData()
     contentViewController.collectionView.backgroundColor = .white
     contentViewController.collectionView.reloadData()
     
@@ -240,6 +148,52 @@ struct UIContactListHeader: UIViewRepresentable {
   
   typealias Coordinator = Void
 }
+
+extension UICollectionViewFlowLayout {
+  public var contentRect: CGRect {
+    guard let collectionView = collectionView else { return .zero }
+    return collectionView.frame.inset(by: sectionInset)
+  }
+  
+  /// The item width that can fit within the given `columnCount`.
+  public func itemWidthForVerticallyScrollingGridLayout(columnCount: Int)
+  -> CGFloat {
+    precondition(columnCount > 0)
+    let interitemSpacerCount = columnCount - 1
+    let totalSpacingForInteritems = minimumInteritemSpacing
+      * CGFloat(interitemSpacerCount)
+    let width = (contentRect.width - totalSpacingForInteritems)
+      / CGFloat(columnCount)
+    // Rounded for pixel-perfect.
+    // We must use rounded down value to prevent exceeding `columnCount`.
+    return width.rounded(.down)
+  }
+  
+//  public func cellSizeForListLayout(for cell: UICollectionViewCell) -> CGSize {
+//    let size = cell.systemLayoutSizeFitting(
+//      contentRect.size,
+//      withHorizontalFittingPriority: .required,
+//      verticalFittingPriority: .fittingSizeLevel
+//    )
+//    return CGSize(width: containerRect.width, height: size.height)
+//  }
+}
+
+//private static func fullWidthForItem(
+//  cell: UICollectionViewCell,
+//  context: Item.Context
+//) -> CGSize? {
+//  guard let layout = context.collectionView
+//          .collectionViewLayout as? UICollectionViewFlowLayout
+//  else { return nil }
+//  let containerRect = layout.containerRect
+//  let size = cell.systemLayoutSizeFitting(
+//    containerRect.size,
+//    withHorizontalFittingPriority: .required,
+//    verticalFittingPriority: .fittingSizeLevel
+//  )
+//  return CGSize(width: containerRect.width, height: size.height)
+//}
 
 //final class ListLayout: UICollectionViewFlowLayout {
 //  static let elementKindSectionBackground = "ListLayout.Background"

@@ -8,44 +8,36 @@
 import UIKit
 
 public struct UICollectionViewSupplementary {
-  public let elementKind: String
-  private let _reuseIdentifier: () -> String
-  private let _supplementaryViewType
-    : () -> UICollectionViewSupplementaryView.Type
-  private let _makeUICollectionViewSupplementaryView
-    : (Context) -> UICollectionViewSupplementaryView
-  private let _updateUICollectionViewSupplementaryView
-    : (UICollectionViewSupplementaryView, Context) -> Void
+  let viewProvider: ViewProvider
+  let updateViewHandler: UpdateViewHandler
+  let sizeProvider: SizeProvider?
   
   public init<Content: UIViewRepresentable>(
+    reuseIdentifier reuseIdentifierProvider: ReuseIdentifierProvider? = nil,
     content: Content,
-    elementKind: String
+    size sizeProvider: SizeProvider? = nil
   ) {
-    typealias SupplementaryView
-      = UICollectionViewSupplementaryBridgeView<Content.UIViewType>
-    
-    let _reuseIdentifier = { String(describing: SupplementaryView.self) }
-    self.elementKind = elementKind
-    self._reuseIdentifier = _reuseIdentifier
-    self._supplementaryViewType = { SupplementaryView.self }
-    self._makeUICollectionViewSupplementaryView = { context in
-      let collectionView = context.coordinator.collectionView
-      let reuseIdentifier = _reuseIdentifier()
-      collectionView.register(
-        SupplementaryView.self,
-        forSupplementaryViewOfKind: elementKind,
-        withReuseIdentifier: reuseIdentifier
-      )
-      let view = collectionView.dequeueReusableSupplementaryView(
-        ofKind: elementKind,
-        withReuseIdentifier: reuseIdentifier,
-        for: context.coordinator.indexPath
-      )
-      as! SupplementaryView
-      return view
+    self.viewProvider = { context in
+      switch context.viewProvidingStrategy {
+      case .new:
+        return View()
+      case .reused:
+        let identifier = reuseIdentifierProvider?(context)
+          ?? String(describing: View.self)
+        context.collectionView.register(
+          View.self,
+          forSupplementaryViewOfKind: context.elementKind,
+          withReuseIdentifier: identifier
+        )
+        return context.collectionView.dequeueReusableSupplementaryView(
+          ofKind: context.elementKind,
+          withReuseIdentifier: identifier,
+          for: context.indexPath
+        ) as! View
+      }
     }
-    self._updateUICollectionViewSupplementaryView = { view, context in
-      let view = view as! SupplementaryView
+    self.updateViewHandler = { view, context in
+      let view = view as! View
       view.updateUI(
         with: content,
         context: Content.Context(
@@ -54,46 +46,28 @@ public struct UICollectionViewSupplementary {
         )
       )
     }
-  }
-
-  public func makeUICollectionViewSupplementaryView(context: Context)
-  -> UICollectionViewSupplementaryView {
-    _makeUICollectionViewSupplementaryView(context)
-  }
-  
-  public func updateUICollectionViewSupplementaryView(
-    _ view: UICollectionViewSupplementaryView,
-    context: Context
-  ) {
-    _updateUICollectionViewSupplementaryView(view, context)
-  }
-  
-  public var reuseIdentifier: String {
-    _reuseIdentifier()
-  }
-  
-  public var supplementaryType: UICollectionViewSupplementaryView.Type {
-    _supplementaryViewType()
+    self.sizeProvider = sizeProvider
+    
+    // MARK: Helpers
+    
+    typealias View = UICollectionViewBridgingSupplementaryView<
+      Content.UIViewType
+    >
   }
 }
 
 // MARK: - Helpers
 
 extension UICollectionViewSupplementary {
-  public typealias Context = UIViewRepresentableContext<Coordinator>
-  
-  public struct Coordinator {
-    public var collectionView: UICollectionView
-    public var indexPath: IndexPath
-    
-    public init(
-      collectionView: UICollectionView,
-      indexPath: IndexPath
-    ) {
-      self.collectionView = collectionView
-      self.indexPath = indexPath
-    }
-  }
+  public typealias Context = UICollectionViewSupplementaryContext
+  public typealias ReuseIdentifierProvider = (Context) -> String
+  typealias ViewProvider = (Context) -> UICollectionReusableView
+  typealias UpdateViewHandler = (
+    UICollectionReusableView,
+    Context
+  ) -> Void
+  public typealias SizeProvider = (
+    UICollectionReusableView,
+    Context
+  ) -> CGSize?
 }
-
-public typealias UICollectionViewSupplementaryView = UICollectionReusableView

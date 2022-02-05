@@ -8,96 +8,113 @@
 import UIKit
 
 public struct UICollectionViewItem {
-  private let _reuseIdentifier: () -> String
-  private let _cellType: () -> UICollectionViewCell.Type
-  private let _makeUICollectionViewCell: (Context) -> UICollectionViewCell
-  private let _updateUICollectionViewCell
-    : (UICollectionViewCell, Context) -> Void
-  public var sizeProvider: SizeProvider?
-  public var onWillAppear: (() -> Void)?
-  public var onSelect: (() -> Void)?
-  
+  var cellProvider: CellProvider
+  var updateCellHandler: UpdateCellHandler
+  var sizeProvider: SizeProvider
+  private(set) var onWillAppearHandler: OnWillAppearHandler?
+  private(set) var onSelectHandler: OnSelectHandler?
+}
+
+extension UICollectionViewItem {
   public init<Content: UIViewRepresentable>(
-    reuseIdentifier reuseIdentifierProvider: (() -> String)? = nil,
+    reuseIdentifier: String? = nil,
     content: Content,
-    sizeProvider: SizeProvider? = nil,
-    onWillAppear: (() -> Void)? = nil,
-    onSelect: (() -> Void)? = nil
+    contentForSizeProvider: Content? = nil,
+    sizeProvider: @escaping SizeProvider
   ) {
-    let _reuseIdentifier = reuseIdentifierProvider
-      ?? { String(describing: Cell.self) }
-    self._reuseIdentifier = _reuseIdentifier
-    self._cellType = { Cell.self }
-    self._makeUICollectionViewCell = { context in
-      let collectionView = context.coordinator.collectionView
-      let reuseIdentifier = _reuseIdentifier()
-      collectionView
-        .register(Cell.self, forCellWithReuseIdentifier: reuseIdentifier)
-      return collectionView.dequeueReusableCell(
-        withReuseIdentifier: reuseIdentifier,
-        for: context.coordinator.indexPath
-      ) as! Cell
-    }
-    self._updateUICollectionViewCell = { cell, context in
-      let cell = cell as! Cell
-      cell.updateUI(
-        with: content,
-        context: Content.Context(
-          coordinator: content.makeCoordinator(),
-          environment: context.environment
+    let reuseIdentifier = reuseIdentifier ?? String(describing: Cell.self)
+    self.init(
+      cellProvider: { context in
+        switch context.cellProvidingTarget {
+        case .sizeForItem:
+          return Cell()
+        case .cellForItem:
+          context.collectionView.register(
+            Cell.self,
+            forCellWithReuseIdentifier: reuseIdentifier
+          )
+          return context.collectionView.dequeueReusableCell(
+            withReuseIdentifier: reuseIdentifier,
+            for: context.indexPath
+          ) as! Cell
+        }
+      },
+      updateCellHandler: { cell, context in
+        let cell = cell as! Cell
+        let targetContent: Content
+        switch context.cellProvidingTarget {
+        case .sizeForItem:
+          targetContent = contentForSizeProvider ?? content
+        case .cellForItem:
+          targetContent = content
+        }
+        cell.updateUI(
+          with: targetContent,
+          context: Content.Context(
+            coordinator: content.makeCoordinator(),
+            environment: context.environment
+          )
         )
-      )
-    }
-    self.sizeProvider = sizeProvider
-    self.onWillAppear = onWillAppear
-    self.onSelect = onSelect
+      },
+      sizeProvider: sizeProvider
+    )
     
     // MARK: Helpers
     
-    typealias Cell = UICollectionViewBridgeCell<Content.UIViewType>
+    typealias Cell = UICollectionViewBridgingCell<Content.UIViewType>
   }
   
-  public func makeUICollectionViewCell(context: Context)
-  -> UICollectionViewCell {
-    _makeUICollectionViewCell(context)
-  }
-
-  public func updateUICollectionViewCell(
-    _ cell: UICollectionViewCell,
-    context: Context
+  public init<Content: UIViewRepresentable>(
+    reuseIdentifier: String? = nil,
+    content: Content,
+    contentForSizeProvider: Content? = nil,
+    sizeProvider: UICollectionViewItemSizeProvider? = nil
   ) {
-    _updateUICollectionViewCell(cell, context)
+    self.init(
+      reuseIdentifier: reuseIdentifier,
+      content: content,
+      contentForSizeProvider: contentForSizeProvider,
+      sizeProvider: { cell, context in
+        let sizeProvider: UICollectionViewItemSizeProvider = sizeProvider
+          ?? .fittingCompressedSize
+        return sizeProvider.collectionView(
+          context.collectionView,
+          context.collectionViewLayout,
+          sizeFor: cell,
+          at: context.indexPath
+        )
+      }
+    )
   }
 }
 
-// MARK: - UICollectionViewCellRegistration
+// MARK: - Modifiers
 
-extension UICollectionViewItem: UICollectionViewCellRegistration {
-  public var reuseIdentifier: String {
-    _reuseIdentifier()
+extension UICollectionViewItem {
+  public func onWillAppear(
+    perform handler: @escaping OnWillAppearHandler
+  ) -> UICollectionViewItem {
+    var newValue = self
+    newValue.onWillAppearHandler = handler
+    return newValue
   }
-
-  public var cellType: UICollectionViewCell.Type {
-    _cellType()
+  
+  public func onSelect(
+    perform handler: @escaping OnSelectHandler
+  ) -> UICollectionViewItem {
+    var newValue = self
+    newValue.onSelectHandler = handler
+    return newValue
   }
 }
 
 // MARK: - Helpers
 
 extension UICollectionViewItem {
-  public typealias Context = UIViewRepresentableContext<Coordinator>
-  public typealias SizeProvider = (UICollectionViewCell, Context) -> CGSize?
-  
-  public struct Coordinator {
-    public var collectionView: UICollectionView
-    public var indexPath: IndexPath
-
-    public init(
-      collectionView: UICollectionView,
-      indexPath: IndexPath
-    ) {
-      self.collectionView = collectionView
-      self.indexPath = indexPath
-    }
-  }
+  public typealias Context = UICollectionViewItemContext
+  typealias CellProvider = (Context) -> UICollectionViewCell
+  typealias UpdateCellHandler = (UICollectionViewCell, Context) -> Void
+  public typealias SizeProvider = (UICollectionViewCell, Context) -> CGSize
+  public typealias OnWillAppearHandler = (UICollectionViewCell, Context) -> Void
+  public typealias OnSelectHandler = (UICollectionViewCell, Context) -> Void
 }
