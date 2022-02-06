@@ -23,7 +23,7 @@
 		B0BC33E52699337F00B6E995 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		B0BC33E82699337F00B6E995 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		B0BC33EA2699337F00B6E995 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		B0BC33F12699368100B6E995 /* tiny-uikit */ = {isa = PBXFileReference; lastKnownFileType = folder; name = "tiny-uikit"; path = ../../../../..; sourceTree = "<group>"; };
+		B0D0737D27AF718900B71A35 /* tiny-uikit */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = "tiny-uikit"; path = ../..; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -41,6 +41,7 @@
 		B0BC33D52699337D00B6E995 = {
 			isa = PBXGroup;
 			children = (
+				B0D0737D27AF718900B71A35 /* tiny-uikit */,
 				B0BC33E02699337D00B6E995 /* Demo */,
 				B0BC33DF2699337D00B6E995 /* Products */,
 				B0BC33F22699368D00B6E995 /* Frameworks */,
@@ -58,7 +59,6 @@
 		B0BC33E02699337D00B6E995 /* Demo */ = {
 			isa = PBXGroup;
 			children = (
-				B0BC33F12699368100B6E995 /* tiny-uikit */,
 				B0BC33E12699337D00B6E995 /* DemoApp.swift */,
 				B0BC33E32699337D00B6E995 /* ContentView.swift */,
 				B07F25912699D1AE00E1E6C7 /* ContactListController.swift */,
