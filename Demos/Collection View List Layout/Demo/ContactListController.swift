@@ -34,7 +34,8 @@ final class ContactListController: UIViewController {
           sizeProvider: { view, context in
             view.systemLayoutSizeFitting(UIView.layoutFittingCompressedSize)
           }
-        ),
+        )
+        .onWillAppear { _, _ in print("Header appeared.") },
         items: [
           Item(
             content: UIContactRow(),
@@ -69,6 +70,7 @@ final class ContactListController: UIViewController {
             view.systemLayoutSizeFitting(UIView.layoutFittingCompressedSize)
           }
         )
+        .onWillAppear { _, _ in print("Footer appeared.") }
       )
     ]
     contentViewController.collectionView.backgroundColor = .white

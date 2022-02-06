@@ -150,6 +150,35 @@ open class UICollectionViewBridgingController
   
   public override func collectionView(
     _ collectionView: UICollectionView,
+    willDisplaySupplementaryView view: UICollectionReusableView,
+    forElementKind elementKind: String,
+    at indexPath: IndexPath
+  ) {
+    guard let section = validSection(atIndex: indexPath.section) else { return }
+    let context = Supplementary.Context(
+      viewProvidingTarget: .viewForSupplementary,
+      elementKind: elementKind,
+      indexPath: indexPath,
+      collectionView: collectionView,
+      collectionViewLayout: collectionViewLayout,
+      environment: environment
+    )
+    switch elementKind {
+    case UICollectionView.elementKindSectionHeader:
+      guard let header = section.header else { return }
+      let view = header.viewProvider(context)
+      header.onWillAppearHandler?(view, context)
+    case UICollectionView.elementKindSectionFooter:
+      guard let footer = section.footer else { return }
+      let view = footer.viewProvider(context)
+      footer.onWillAppearHandler?(view, context)
+    default:
+      return
+    }
+  }
+  
+  public override func collectionView(
+    _ collectionView: UICollectionView,
     didSelectItemAt indexPath: IndexPath
   ) {
     guard let item = validItem(at: indexPath) else { return }

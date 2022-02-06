@@ -11,6 +11,7 @@ public struct UICollectionViewSupplementary {
   var viewProvider: ViewProvider
   var updateViewHandler: UpdateViewHandler
   var sizeProvider: SizeProvider
+  private(set) var onWillAppearHandler: OnWillAppearHandler?
 }
 
 extension UICollectionViewSupplementary {
@@ -59,6 +60,18 @@ extension UICollectionViewSupplementary {
   }
 }
 
+// MARK: - Modifiers
+
+extension UICollectionViewSupplementary {
+  public func onWillAppear(
+    perform handler: @escaping OnWillAppearHandler
+  ) -> UICollectionViewSupplementary {
+    var newValue = self
+    newValue.onWillAppearHandler = handler
+    return newValue
+  }
+}
+
 // MARK: - Helpers
 
 extension UICollectionViewSupplementary {
@@ -72,4 +85,5 @@ extension UICollectionViewSupplementary {
     UICollectionReusableView,
     Context
   ) -> CGSize
+  public typealias OnWillAppearHandler = (UICollectionReusableView, Context) -> Void
 }
