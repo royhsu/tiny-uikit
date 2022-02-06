@@ -102,7 +102,7 @@ open class UICollectionViewBridgingController
       return dequeueUnknownSupplementaryView()
     }
     let context = Supplementary.Context(
-      viewProvidingStrategy: .reused,
+      viewProvidingTarget: .viewForSupplementary,
       elementKind: kind,
       indexPath: indexPath,
       collectionView: collectionView,
@@ -195,7 +195,7 @@ open class UICollectionViewBridgingController
     // There is only one header in a section so it's ok to use the first item
     // index path as reference for whole section.
     let context = Supplementary.Context(
-      viewProvidingStrategy: .new,
+      viewProvidingTarget: .sizeForSupplementary,
       elementKind: UICollectionView.elementKindSectionHeader,
       indexPath: IndexPath(item: 0, section: section),
       collectionView: collectionView,
@@ -204,7 +204,7 @@ open class UICollectionViewBridgingController
     )
     let view = header.viewProvider(context)
     header.updateViewHandler(view, context)
-    return header.sizeProvider?(view, context) ?? defaultSupplementaryViewSize
+    return header.sizeProvider(view, context)
   }
   
   public func collectionView(
@@ -218,7 +218,7 @@ open class UICollectionViewBridgingController
     // There is only one footer in a section so it's ok to use the first item
     // index path as reference for whole section.
     let context = Supplementary.Context(
-      viewProvidingStrategy: .new,
+      viewProvidingTarget: .sizeForSupplementary,
       elementKind: UICollectionView.elementKindSectionFooter,
       indexPath: IndexPath(item: 0, section: section),
       collectionView: collectionView,
@@ -227,7 +227,7 @@ open class UICollectionViewBridgingController
     )
     let view = footer.viewProvider(context)
     footer.updateViewHandler(view, context)
-    return footer.sizeProvider?(view, context) ?? defaultSupplementaryViewSize
+    return footer.sizeProvider(view, context)
   }
 }
 
@@ -236,10 +236,6 @@ open class UICollectionViewBridgingController
 extension UICollectionViewBridgingController {
   public typealias Item = UICollectionViewItem
   public typealias Supplementary = UICollectionViewSupplementary
-  
-  private var defaultSupplementaryViewSize: CGSize {
-   CGSize(width: 44.0, height: 44.0)
-  }
   
   public struct Section {
     public var id: String

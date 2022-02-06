@@ -31,7 +31,7 @@ final class ContactListController: UIViewController {
       Section(
         header: UICollectionViewSupplementary(
           content: UIContactListHeader(),
-          size: { view, context in
+          sizeProvider: { view, context in
             view.systemLayoutSizeFitting(UIView.layoutFittingCompressedSize)
           }
         ),
@@ -65,7 +65,7 @@ final class ContactListController: UIViewController {
         ],
         footer: UICollectionViewSupplementary(
           content: UIContactListHeader(),
-          size: { view, context in
+          sizeProvider: { view, context in
             view.systemLayoutSizeFitting(UIView.layoutFittingCompressedSize)
           }
         )
