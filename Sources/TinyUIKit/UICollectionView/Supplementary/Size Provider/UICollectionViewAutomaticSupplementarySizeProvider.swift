@@ -1,30 +1,32 @@
 //
-//  UICollectionViewAutomaticItemSizeProvider.swift
+//  UICollectionViewAutomaticSupplementarySizeProvider.swift
 //  
 //
-//  Created by Roy Hsu on 2022/2/4.
+//  Created by Roy Hsu on 2022/2/6.
 //
+
 
 import UIKit
 
-public struct UICollectionViewAutomaticItemSizeProvider
-: UICollectionViewItemSizeProvider {
+public struct UICollectionViewAutomaticSupplementarySizeProvider
+: UICollectionViewSupplementarySizeProvider {
   var targetSize: CGSize
   
   public func collectionView(
     _ collectionView: UICollectionView,
     _ collectionViewLayout: UICollectionViewLayout,
-    sizeFor cell: UICollectionViewCell,
+    elementKind: String,
+    sizeFor view: UICollectionReusableView,
     at indexPath: IndexPath
   ) -> CGSize {
-    cell.systemLayoutSizeFitting(targetSize)
+    view.systemLayoutSizeFitting(targetSize)
   }
 }
 
 // MARK: - UICollectionViewItemSizeProvider
 
-extension UICollectionViewItemSizeProvider
-where Self == UICollectionViewAutomaticItemSizeProvider {
+extension UICollectionViewSupplementarySizeProvider
+where Self == UICollectionViewAutomaticSupplementarySizeProvider {
   public static var fittingCompressedSize: Self {
     Self(targetSize: UIView.layoutFittingCompressedSize)
   }

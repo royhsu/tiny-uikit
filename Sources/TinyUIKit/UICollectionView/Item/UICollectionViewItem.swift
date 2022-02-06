@@ -51,7 +51,7 @@ extension UICollectionViewItem {
         cell.updateUI(
           with: targetContent,
           context: Content.Context(
-            coordinator: content.makeCoordinator(),
+            coordinator: targetContent.makeCoordinator(),
             environment: context.environment
           )
         )

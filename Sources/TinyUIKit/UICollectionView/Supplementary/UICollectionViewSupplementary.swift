@@ -18,6 +18,7 @@ extension UICollectionViewSupplementary {
   public init<Content: UIViewRepresentable>(
     reuseIdentifier: String? = nil,
     content: Content,
+    contentForSizeProvider: Content? = nil,
     sizeProvider: @escaping SizeProvider
   ) {
     let reuseIdentifier = reuseIdentifier ?? String(describing: View.self)
@@ -41,10 +42,17 @@ extension UICollectionViewSupplementary {
       },
       updateViewHandler: { view, context in
         let view = view as! View
+        let targetContent: Content
+        switch context.viewProvidingTarget {
+        case .sizeForSupplementary:
+          targetContent = contentForSizeProvider ?? content
+        case .viewForSupplementary:
+          targetContent = content
+        }
         view.updateUI(
-          with: content,
+          with: targetContent,
           context: Content.Context(
-            coordinator: content.makeCoordinator(),
+            coordinator: targetContent.makeCoordinator(),
             environment: context.environment
           )
         )
@@ -57,6 +65,30 @@ extension UICollectionViewSupplementary {
     typealias View = UICollectionViewBridgingSupplementaryView<
       Content.UIViewType
     >
+  }
+  
+  public init<Content: UIViewRepresentable>(
+    reuseIdentifier: String? = nil,
+    content: Content,
+    contentForSizeProvider: Content? = nil,
+    sizeProvider: UICollectionViewSupplementarySizeProvider? = nil
+  ) {
+    self.init(
+      reuseIdentifier: reuseIdentifier,
+      content: content,
+      contentForSizeProvider: contentForSizeProvider,
+      sizeProvider: { view, context in
+        let sizeProvider: UICollectionViewSupplementarySizeProvider
+          = sizeProvider ?? .fittingCompressedSize
+        return sizeProvider.collectionView(
+          context.collectionView,
+          context.collectionViewLayout,
+          elementKind: context.elementKind,
+          sizeFor: view,
+          at: context.indexPath
+        )
+      }
+    )
   }
 }
 
