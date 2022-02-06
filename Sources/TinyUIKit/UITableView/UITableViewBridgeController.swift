@@ -174,8 +174,4 @@ extension UITableViewBridgeController {
       self.footer = footer
     }
   }
-  
-  private var environment: UIEnvironmentValues {
-    UIEnvironmentValues(traitCollection: traitCollection)
-  }
 }

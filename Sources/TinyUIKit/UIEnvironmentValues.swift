@@ -14,3 +14,11 @@ public struct UIEnvironmentValues {
     self.traitCollection = traitCollection
   }
 }
+
+// MARK: - UIViewController
+
+extension UIViewController {
+  public var environment: UIEnvironmentValues {
+    UIEnvironmentValues(traitCollection: traitCollection)
+  }
+}

@@ -279,8 +279,4 @@ extension UICollectionViewBridgingController {
     guard indexPath.item < section.items.count else { return nil }
     return section.items[AnyIndex(indexPath.item)]
   }
-  
-  private var environment: UIEnvironmentValues {
-    UIEnvironmentValues(traitCollection: traitCollection)
-  }
 }
