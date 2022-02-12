@@ -11,11 +11,8 @@ import UIKit
 final class ContactListController: UIViewController {
 //  private let contentViewController = UITableViewBridgeController<Void>()
   private let listLayout: UICollectionViewFlowLayout = {
-//    let layout = ListLayout()
     let layout = UICollectionViewFlowLayout()
-//    layout.estimatedItemSize = UICollectionViewFlowLayout.automaticSize
-    layout.itemSize = CGSize(width: 150.0, height: 150.0)
-//    layout.sectionHeadersPinToVisibleBounds = true
+    layout.sectionHeadersPinToVisibleBounds = true
     return layout
   }()
   private typealias Section = UICollectionViewBridgingController.Section
@@ -29,12 +26,8 @@ final class ContactListController: UIViewController {
     contentViewController.collectionView.layoutMargins = .zero
     contentViewController.sections = [
       Section(
-        header: UICollectionViewSupplementary(
-          content: UIContactListHeader(),
-          size: { view, context in
-            view.systemLayoutSizeFitting(UIView.layoutFittingCompressedSize)
-          }
-        ),
+        header: UICollectionViewSupplementary(content: UIContactListHeader())
+          .onWillAppear { _, _ in print("Header appeared.") },
         items: [
           Item(
             content: UIContactRow(),
@@ -62,13 +55,37 @@ final class ContactListController: UIViewController {
           .onSelect { _, _ in
             print("Selected!!")
           },
+          Item(
+            content: UIContactRow(),
+            sizeProvider: .listLayout
+          ),
+          Item(
+            content: UIContactRow(),
+            sizeProvider: .listLayout
+          ),
+          Item(
+            content: UIContactRow(),
+            sizeProvider: .listLayout
+          ),
+          Item(
+            content: UIContactRow(),
+            sizeProvider: .listLayout
+          ),
+          Item(
+            content: UIContactRow(),
+            sizeProvider: .listLayout
+          ),
+          Item(
+            content: UIContactRow(),
+            sizeProvider: .listLayout
+          ),
+          Item(
+            content: UIContactRow(),
+            sizeProvider: .listLayout
+          ),
         ],
-        footer: UICollectionViewSupplementary(
-          content: UIContactListHeader(),
-          size: { view, context in
-            view.systemLayoutSizeFitting(UIView.layoutFittingCompressedSize)
-          }
-        )
+        footer: UICollectionViewSupplementary(content: UIContactListHeader())
+          .onWillAppear { _, _ in print("Footer appeared.") }
       )
     ]
     contentViewController.collectionView.backgroundColor = .white
@@ -82,17 +99,29 @@ final class ContactListController: UIViewController {
     contentView.translatesAutoresizingMaskIntoConstraints = false
     view.addSubview(contentView)
     NSLayoutConstraint.activate([
-      // Horizontal.
-      contentView.leadingAnchor
-        .constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
-      contentView.trailingAnchor
-        .constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
-      
-      // Vertical.
-      contentView.topAnchor
-        .constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
-      contentView.bottomAnchor
-        .constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
+        // Horizontal.
+        contentView.leadingAnchor
+          .constraint(equalTo: view.leadingAnchor),
+        contentView.trailingAnchor
+          .constraint(equalTo: view.trailingAnchor),
+        
+        // Vertical.
+        contentView.topAnchor
+          .constraint(equalTo: view.topAnchor),
+        contentView.bottomAnchor
+          .constraint(equalTo: view.bottomAnchor),
+        
+//      // Horizontal.
+//      contentView.leadingAnchor
+//        .constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
+//      contentView.trailingAnchor
+//        .constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
+//
+//      // Vertical.
+//      contentView.topAnchor
+//        .constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+//      contentView.bottomAnchor
+//        .constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
     ])
     
     contentViewController.didMove(toParent: self)

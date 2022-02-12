@@ -102,7 +102,7 @@ open class UICollectionViewBridgingController
       return dequeueUnknownSupplementaryView()
     }
     let context = Supplementary.Context(
-      viewProvidingStrategy: .reused,
+      viewProvidingTarget: .viewForSupplementary,
       elementKind: kind,
       indexPath: indexPath,
       collectionView: collectionView,
@@ -146,6 +146,35 @@ open class UICollectionViewBridgingController
     )
     let cell = item.cellProvider(context)
     item.onWillAppearHandler?(cell, context)
+  }
+  
+  public override func collectionView(
+    _ collectionView: UICollectionView,
+    willDisplaySupplementaryView view: UICollectionReusableView,
+    forElementKind elementKind: String,
+    at indexPath: IndexPath
+  ) {
+    guard let section = validSection(atIndex: indexPath.section) else { return }
+    let context = Supplementary.Context(
+      viewProvidingTarget: .viewForSupplementary,
+      elementKind: elementKind,
+      indexPath: indexPath,
+      collectionView: collectionView,
+      collectionViewLayout: collectionViewLayout,
+      environment: environment
+    )
+    switch elementKind {
+    case UICollectionView.elementKindSectionHeader:
+      guard let header = section.header else { return }
+      let view = header.viewProvider(context)
+      header.onWillAppearHandler?(view, context)
+    case UICollectionView.elementKindSectionFooter:
+      guard let footer = section.footer else { return }
+      let view = footer.viewProvider(context)
+      footer.onWillAppearHandler?(view, context)
+    default:
+      return
+    }
   }
   
   public override func collectionView(
@@ -195,7 +224,7 @@ open class UICollectionViewBridgingController
     // There is only one header in a section so it's ok to use the first item
     // index path as reference for whole section.
     let context = Supplementary.Context(
-      viewProvidingStrategy: .new,
+      viewProvidingTarget: .sizeForSupplementary,
       elementKind: UICollectionView.elementKindSectionHeader,
       indexPath: IndexPath(item: 0, section: section),
       collectionView: collectionView,
@@ -204,7 +233,7 @@ open class UICollectionViewBridgingController
     )
     let view = header.viewProvider(context)
     header.updateViewHandler(view, context)
-    return header.sizeProvider?(view, context) ?? defaultSupplementaryViewSize
+    return header.sizeProvider(view, context)
   }
   
   public func collectionView(
@@ -218,7 +247,7 @@ open class UICollectionViewBridgingController
     // There is only one footer in a section so it's ok to use the first item
     // index path as reference for whole section.
     let context = Supplementary.Context(
-      viewProvidingStrategy: .new,
+      viewProvidingTarget: .sizeForSupplementary,
       elementKind: UICollectionView.elementKindSectionFooter,
       indexPath: IndexPath(item: 0, section: section),
       collectionView: collectionView,
@@ -227,7 +256,7 @@ open class UICollectionViewBridgingController
     )
     let view = footer.viewProvider(context)
     footer.updateViewHandler(view, context)
-    return footer.sizeProvider?(view, context) ?? defaultSupplementaryViewSize
+    return footer.sizeProvider(view, context)
   }
 }
 
@@ -236,10 +265,6 @@ open class UICollectionViewBridgingController
 extension UICollectionViewBridgingController {
   public typealias Item = UICollectionViewItem
   public typealias Supplementary = UICollectionViewSupplementary
-  
-  private var defaultSupplementaryViewSize: CGSize {
-   CGSize(width: 44.0, height: 44.0)
-  }
   
   public struct Section {
     public var id: String
@@ -278,9 +303,5 @@ extension UICollectionViewBridgingController {
     }
     guard indexPath.item < section.items.count else { return nil }
     return section.items[AnyIndex(indexPath.item)]
-  }
-  
-  private var environment: UIEnvironmentValues {
-    UIEnvironmentValues(traitCollection: traitCollection)
   }
 }

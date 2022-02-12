@@ -26,14 +26,10 @@ public struct UICollectionViewAutomaticItemSizeProvider
 extension UICollectionViewItemSizeProvider
 where Self == UICollectionViewAutomaticItemSizeProvider {
   public static var fittingCompressedSize: Self {
-    UICollectionViewAutomaticItemSizeProvider(
-      targetSize: UIView.layoutFittingCompressedSize
-    )
+    Self(targetSize: UIView.layoutFittingCompressedSize)
   }
   
   public static var fittingExpandedSize: Self {
-    UICollectionViewAutomaticItemSizeProvider(
-      targetSize: UIView.layoutFittingExpandedSize
-    )
+    Self(targetSize: UIView.layoutFittingExpandedSize)
   }
 }

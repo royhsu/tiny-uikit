@@ -21,10 +21,10 @@ extension UICollectionViewItemContext {
   public typealias Environment = UIEnvironmentValues
   
   public enum CellProvidingTarget {
-    /// Equivalent to `collectionView(_:layout:sizeForItemAt:)`.
+    /// For `collectionView(_:layout:sizeForItemAt:)`.
     case sizeForItem
     
-    /// Equivalent to `collectionView(_:cellForItemAt:)`.
+    /// For `collectionView(_:cellForItemAt:)`.
     case cellForItem
   }
 }
