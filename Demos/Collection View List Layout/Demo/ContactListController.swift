@@ -99,17 +99,29 @@ final class ContactListController: UIViewController {
     contentView.translatesAutoresizingMaskIntoConstraints = false
     view.addSubview(contentView)
     NSLayoutConstraint.activate([
-      // Horizontal.
-      contentView.leadingAnchor
-        .constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
-      contentView.trailingAnchor
-        .constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
-      
-      // Vertical.
-      contentView.topAnchor
-        .constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
-      contentView.bottomAnchor
-        .constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
+        // Horizontal.
+        contentView.leadingAnchor
+          .constraint(equalTo: view.leadingAnchor),
+        contentView.trailingAnchor
+          .constraint(equalTo: view.trailingAnchor),
+        
+        // Vertical.
+        contentView.topAnchor
+          .constraint(equalTo: view.topAnchor),
+        contentView.bottomAnchor
+          .constraint(equalTo: view.bottomAnchor),
+        
+//      // Horizontal.
+//      contentView.leadingAnchor
+//        .constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
+//      contentView.trailingAnchor
+//        .constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
+//
+//      // Vertical.
+//      contentView.topAnchor
+//        .constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+//      contentView.bottomAnchor
+//        .constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
     ])
     
     contentViewController.didMove(toParent: self)
