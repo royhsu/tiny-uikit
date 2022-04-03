@@ -24,6 +24,7 @@ public struct UICollectionViewVerticallyScrollingGridLayoutItemSizeProvider
     let itemWidth = flowLayout.itemWidthForVerticallyScrollingGridLayout(
       columnCount: columnCount
     )
+    guard itemWidth > 0.0 else { return .zero }
     let proposedSize = cell.systemLayoutSizeFitting(
       CGSize(
         width: itemWidth,

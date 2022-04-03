@@ -8,6 +8,7 @@
 import UIKit
 
 public struct UICollectionViewItem {
+  public var id: String
   var cellProvider: CellProvider
   var updateCellHandler: UpdateCellHandler
   var sizeProvider: SizeProvider
@@ -17,6 +18,7 @@ public struct UICollectionViewItem {
 
 extension UICollectionViewItem {
   public init<Content: UIViewRepresentable>(
+    id: String? = nil,
     reuseIdentifier: String? = nil,
     content: Content,
     contentForSizeProvider: Content? = nil,
@@ -24,6 +26,7 @@ extension UICollectionViewItem {
   ) {
     let reuseIdentifier = reuseIdentifier ?? String(describing: Cell.self)
     self.init(
+      id: id ?? UUID().uuidString,
       cellProvider: { context in
         switch context.cellProvidingTarget {
         case .sizeForItem:

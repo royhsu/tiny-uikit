@@ -269,20 +269,20 @@ extension UICollectionViewBridgingController {
   public struct Section {
     public var id: String
     public var header: Supplementary?
-    public var items: AnyCollection<Item>
+    public var items: [Item]
     public var footer: Supplementary?
     public var decorations: [Supplementary]
     
-    public init<C: Collection>(
+    public init(
       id: String? = nil,
       header: Supplementary? = nil,
-      items: C,
+      items: [Item],
       footer: Supplementary? = nil,
       decorations: [Supplementary]? = nil
-    ) where C.Element == Item, C.Index == Int {
+    ) {
       self.id = id ?? UUID().uuidString
       self.header = header
-      self.items = AnyCollection(items)
+      self.items = items
       self.footer = footer
       self.decorations = decorations ?? []
     }
@@ -302,6 +302,6 @@ extension UICollectionViewBridgingController {
       return nil
     }
     guard indexPath.item < section.items.count else { return nil }
-    return section.items[AnyIndex(indexPath.item)]
+    return section.items[indexPath.item]
   }
 }
