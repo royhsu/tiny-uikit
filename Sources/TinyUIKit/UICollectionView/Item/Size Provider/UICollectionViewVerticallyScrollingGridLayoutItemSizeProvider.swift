@@ -25,7 +25,14 @@ public struct UICollectionViewVerticallyScrollingGridLayoutItemSizeProvider
       columnCount: columnCount
     )
     guard itemWidth > 0.0 else { return .zero }
-    let proposedSize = view.systemLayoutSizeFitting(
+    
+    // WORKAROUND: iOS 12.X will unexpectedly return 0.0 width.
+    // We have to use the `itemWidth` explicitly in order to fix this.
+    // Reference:
+    // - [UICollectionViewFlowLayout estimatedItemSize does not work properly with iOS12 though it works fine with iOS 11.*](https://stackoverflow.com/questions/51718787/uicollectionviewflowlayout-estimateditemsize-does-not-work-properly-with-ios12-t/52389062#52389062)
+    // - [In iOS 12, when does the UICollectionView layout cells, use autolayout in nib](https://stackoverflow.com/questions/51375566/in-ios-12-when-does-the-uicollectionview-layout-cells-use-autolayout-in-nib/52428617#52428617)
+    // - [iOS 12 Release Notes](https://developer.apple.com/documentation/ios-ipados-release-notes/ios-12-release-notes)
+    let estimatedSize = view.systemLayoutSizeFitting(
       CGSize(
         width: itemWidth,
         height: UIView.layoutFittingCompressedSize.height
@@ -33,14 +40,13 @@ public struct UICollectionViewVerticallyScrollingGridLayoutItemSizeProvider
       withHorizontalFittingPriority: .required,
       verticalFittingPriority: .fittingSizeLevel
     )
-    // WORKAROUND: iOS 12.X will unexpectedly return 0.0 width from
-    // `proposedSize` above.
-    // We have to use the `itemWidth` explicitly in order to fix this.
-    // Reference:
-    // - [UICollectionViewFlowLayout estimatedItemSize does not work properly with iOS12 though it works fine with iOS 11.*](https://stackoverflow.com/questions/51718787/uicollectionviewflowlayout-estimateditemsize-does-not-work-properly-with-ios12-t/52389062#52389062)
-    // - [In iOS 12, when does the UICollectionView layout cells, use autolayout in nib](https://stackoverflow.com/questions/51375566/in-ios-12-when-does-the-uicollectionview-layout-cells-use-autolayout-in-nib/52428617#52428617)
-    // - [iOS 12 Release Notes](https://developer.apple.com/documentation/ios-ipados-release-notes/ios-12-release-notes)
-    return CGSize(width: itemWidth, height: proposedSize.height)
+    
+    let preferredSize = CGSize(
+      width: itemWidth,
+      height: estimatedSize.height.rounded(.up) // Rounded up to make sure item view content won't be truncated.
+    )
+    
+    return preferredSize
   }
 }
 
