@@ -47,7 +47,7 @@ final class ContactListController: UIViewController {
           ),
           Item(
             content: UIContactRow(),
-            sizeProvider: { _, _ in CGSize(width: 200.0, height: 200.0) }
+            sizeProvider: { _ in CGSize(width: 200.0, height: 200.0) }
           ),
           Item(
             content: UIContactRow()

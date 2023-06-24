@@ -11,7 +11,7 @@ public protocol UICollectionViewItemSizeProvider {
   func collectionView(
     _ collectionView: UICollectionView,
     _ collectionViewLayout: UICollectionViewLayout,
-    sizeFor cell: UICollectionViewCell,
+    sizeFor view: UIView,
     at indexPath: IndexPath
   ) -> CGSize
 }

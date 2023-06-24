@@ -14,7 +14,7 @@ public struct UICollectionViewVerticallyScrollingGridLayoutItemSizeProvider
   public func collectionView(
     _ collectionView: UICollectionView,
     _ collectionViewLayout: UICollectionViewLayout,
-    sizeFor cell: UICollectionViewCell,
+    sizeFor view: UIView,
     at indexPath: IndexPath
   ) -> CGSize {
     guard let flowLayout = collectionViewLayout as? UICollectionViewFlowLayout
@@ -25,7 +25,7 @@ public struct UICollectionViewVerticallyScrollingGridLayoutItemSizeProvider
       columnCount: columnCount
     )
     guard itemWidth > 0.0 else { return .zero }
-    let proposedSize = cell.systemLayoutSizeFitting(
+    let proposedSize = view.systemLayoutSizeFitting(
       CGSize(
         width: itemWidth,
         height: UIView.layoutFittingCompressedSize.height

@@ -201,6 +201,8 @@ open class UICollectionViewBridgingController
     sizeForItemAt indexPath: IndexPath
   ) -> CGSize {
     guard let item = validItem(at: indexPath) else { return .zero }
+    
+    // Prepare context for item.
     let context = Item.Context(
       cellProvidingTarget: .sizeForItem,
       indexPath: indexPath,
@@ -208,9 +210,8 @@ open class UICollectionViewBridgingController
       collectionViewLayout: collectionViewLayout,
       environment: environment
     )
-    let cell = item.cellProvider(context)
-    item.updateCellHandler(cell, context)
-    return item.sizeProvider(cell, context)
+    
+    return item.sizeProvider(context)
   }
   
   public func collectionView(

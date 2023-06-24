@@ -9,11 +9,11 @@ import UIKit
 
 public final class UICollectionViewBridgingCell<UIViewType: UIView>
 : UICollectionViewCell {
-  private(set) weak var bridgeView: UIViewType?
+  private(set) weak var bridgingView: UIViewType?
   
   public override func prepareForReuse() {
     super.prepareForReuse()
-    let reusableView = bridgeView as? Reusable
+    let reusableView = bridgingView as? Reusable
     reusableView?.prepareForReuse()
   }
 }
@@ -21,30 +21,26 @@ public final class UICollectionViewBridgingCell<UIViewType: UIView>
 // MARK: - Helpers
 
 extension UICollectionViewBridgingCell {
-  public func updateUI<Value: UIViewRepresentable>(
-    with value: Value,
-    context: Value.Context
-  ) where Value.UIViewType == UIViewType {
-    if let bridgeView = bridgeView,
-       bridgeView.superview === contentView {
-      value.updateUIView(bridgeView, context: context)
-    } else {
-      let newView = value.makeUIView(context: context)
-      value.updateUIView(newView, context: context)
-      bridgeView = newView
-      
-      // Layout.
-      newView.translatesAutoresizingMaskIntoConstraints = false
-      contentView.addSubview(newView)
-      NSLayoutConstraint.activate([
-        // Horizontal.
-        newView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
-        newView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
+  public func installBridgingView(_ view: UIViewType) {
+    // Uninstall old bridging view before installing new one.
+    bridgingView?.removeFromSuperview()
+    
+    // Keep the weak reference to the new bridging view.
+    bridgingView = view
+    
+    // Handle layout.
+    view.translatesAutoresizingMaskIntoConstraints = false
+    contentView.addSubview(view)
+    
+    // Install active constraints.
+    NSLayoutConstraint.activate([
+      // Horizontal.
+      view.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
+      view.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
 
-        // Vertical.
-        newView.topAnchor.constraint(equalTo: contentView.topAnchor),
-        newView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
-      ])
-    }
+      // Vertical.
+      view.topAnchor.constraint(equalTo: contentView.topAnchor),
+      view.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
+    ])
   }
 }

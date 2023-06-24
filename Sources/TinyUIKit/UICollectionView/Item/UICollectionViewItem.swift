@@ -8,12 +8,18 @@
 import UIKit
 
 public struct UICollectionViewItem {
+  
+  // MARK: States
+  
   public var id: String
+  
+  // MARK: Resolvers
+  
   var cellProvider: CellProvider
   var updateCellHandler: UpdateCellHandler
   var sizeProvider: SizeProvider
-  private(set) var onWillAppearHandler: OnWillAppearHandler?
-  private(set) var onSelectHandler: OnSelectHandler?
+  var onWillAppearHandler: OnWillAppearHandler?
+  var onSelectHandler: OnSelectHandler?
 }
 
 extension UICollectionViewItem {
@@ -21,43 +27,54 @@ extension UICollectionViewItem {
     id: String? = nil,
     reuseIdentifier: String? = nil,
     content: Content,
-    contentForSizeProvider: Content? = nil,
     sizeProvider: @escaping SizeProvider
   ) {
     let reuseIdentifier = reuseIdentifier ?? String(describing: Cell.self)
+    
     self.init(
       id: id ?? UUID().uuidString,
       cellProvider: { context in
-        switch context.cellProvidingTarget {
-        case .sizeForItem:
-          return Cell()
-        case .cellForItem:
-          context.collectionView.register(
-            Cell.self,
-            forCellWithReuseIdentifier: reuseIdentifier
-          )
-          return context.collectionView.dequeueReusableCell(
-            withReuseIdentifier: reuseIdentifier,
-            for: context.indexPath
-          ) as! Cell
-        }
-      },
-      updateCellHandler: { cell, context in
-        let cell = cell as! Cell
-        let targetContent: Content
-        switch context.cellProvidingTarget {
-        case .sizeForItem:
-          targetContent = contentForSizeProvider ?? content
-        case .cellForItem:
-          targetContent = content
-        }
-        cell.updateUI(
-          with: targetContent,
-          context: Content.Context(
-            coordinator: targetContent.makeCoordinator(),
-            environment: context.environment
-          )
+        context.collectionView.register(
+          Cell.self,
+          forCellWithReuseIdentifier: reuseIdentifier
         )
+        
+        return context.collectionView.dequeueReusableCell(
+          withReuseIdentifier: reuseIdentifier,
+          for: context.indexPath
+        ) as! Cell
+      },
+      updateCellHandler: { cell, itemContext in
+        let cell = cell as! Cell
+        
+        // Prepare context for content view.
+        let viewContext = Content.Context(
+          coordinator: content.makeCoordinator(),
+          environment: itemContext.environment
+        )
+        
+        // Start to resolve content view.
+        let view: Content.UIViewType
+        
+        if let bridgingView = cell.bridgingView {
+          // Reuse the existing content view from the target cell.
+          view = bridgingView
+        } else {
+          // Making a new content view.
+          view = content.makeUIView(context: viewContext)
+        }
+        
+        // Install content view on cell.
+        if (view.superview === cell.contentView) {
+          // Content view is already installed on the target cell.
+        } else {
+          cell.installBridgingView(view)
+        }
+        
+        // Finish to resolve content view.
+        
+        // Update content view.
+        content.updateUIView(view, context: viewContext)
       },
       sizeProvider: sizeProvider
     )
@@ -70,21 +87,30 @@ extension UICollectionViewItem {
   public init<Content: UIViewRepresentable>(
     reuseIdentifier: String? = nil,
     content: Content,
-    contentForSizeProvider: Content? = nil,
     sizeProvider: UICollectionViewItemSizeProvider? = nil
   ) {
     self.init(
       reuseIdentifier: reuseIdentifier,
       content: content,
-      contentForSizeProvider: contentForSizeProvider,
-      sizeProvider: { cell, context in
+      sizeProvider: { itemContext in
         let sizeProvider: UICollectionViewItemSizeProvider = sizeProvider
           ?? .fittingCompressedSize
+        
+        // Prepare context for content view.
+        let viewContext = Content.Context(
+          coordinator: content.makeCoordinator(),
+          environment: itemContext.environment
+        )
+        
+        let view = content.makeUIView(context: viewContext)
+        
+        content.updateUIView(view, context: viewContext)
+        
         return sizeProvider.collectionView(
-          context.collectionView,
-          context.collectionViewLayout,
-          sizeFor: cell,
-          at: context.indexPath
+          itemContext.collectionView,
+          itemContext.collectionViewLayout,
+          sizeFor: view,
+          at: itemContext.indexPath
         )
       }
     )
@@ -117,7 +143,7 @@ extension UICollectionViewItem {
   public typealias Context = UICollectionViewItemContext
   typealias CellProvider = (Context) -> UICollectionViewCell
   typealias UpdateCellHandler = (UICollectionViewCell, Context) -> Void
-  public typealias SizeProvider = (UICollectionViewCell, Context) -> CGSize
+  public typealias SizeProvider = (Context) -> CGSize
   public typealias OnWillAppearHandler = (UICollectionViewCell, Context) -> Void
   public typealias OnSelectHandler = (UICollectionViewCell, Context) -> Void
 }

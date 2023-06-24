@@ -8,6 +8,7 @@
 import UIKit
 
 public struct UICollectionViewItemContext {
+  @available(*, deprecated)
   public var cellProvidingTarget: CellProvidingTarget
   public var indexPath: IndexPath
   public var collectionView: UICollectionView

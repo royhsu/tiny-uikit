@@ -14,10 +14,10 @@ public struct UICollectionViewAutomaticItemSizeProvider
   public func collectionView(
     _ collectionView: UICollectionView,
     _ collectionViewLayout: UICollectionViewLayout,
-    sizeFor cell: UICollectionViewCell,
+    sizeFor view: UIView,
     at indexPath: IndexPath
   ) -> CGSize {
-    cell.systemLayoutSizeFitting(targetSize)
+    view.systemLayoutSizeFitting(targetSize)
   }
 }
 
