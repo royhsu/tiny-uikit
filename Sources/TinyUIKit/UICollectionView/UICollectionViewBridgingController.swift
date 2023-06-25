@@ -69,8 +69,9 @@ open class UICollectionViewBridgingController
         for: indexPath
       )
     }
+    
+    // Prepare context for item.
     let context = Item.Context(
-      cellProvidingTarget: .cellForItem,
       indexPath: indexPath,
       collectionView: collectionView,
       collectionViewLayout: collectionViewLayout,
@@ -78,6 +79,7 @@ open class UICollectionViewBridgingController
     )
     let cell = item.cellProvider(context)
     item.updateCellHandler(cell, context)
+    
     return cell
   }
   
@@ -86,6 +88,42 @@ open class UICollectionViewBridgingController
     viewForSupplementaryElementOfKind kind: String,
     at indexPath: IndexPath
   ) -> UICollectionReusableView {
+    guard let section = validSection(atIndex: indexPath.section) else {
+      return dequeueUnknownSupplementaryView()
+    }
+    
+    // Prepare context for item.
+    let context = Supplementary.Context(
+      viewProvidingTarget: .viewForSupplementary,
+      elementKind: kind,
+      indexPath: indexPath,
+      collectionView: collectionView,
+      collectionViewLayout: collectionViewLayout,
+      environment: environment
+    )
+    
+    switch kind {
+    case UICollectionView.elementKindSectionHeader:
+      guard let header = section.header else {
+        return dequeueUnknownSupplementaryView()
+      }
+      
+      let view = header.viewProvider(context)
+      header.updateViewHandler(view, context)
+      
+      return view
+    case UICollectionView.elementKindSectionFooter:
+      guard let footer = section.footer else {
+        return dequeueUnknownSupplementaryView()
+      }
+      
+      let view = footer.viewProvider(context)
+      footer.updateViewHandler(view, context)
+      
+      return view
+    default:
+      return dequeueUnknownSupplementaryView()
+    }
     
     // MARK: Helpers
     
@@ -97,36 +135,6 @@ open class UICollectionViewBridgingController
         for: indexPath
       )
     }
-    
-    guard let section = validSection(atIndex: indexPath.section) else {
-      return dequeueUnknownSupplementaryView()
-    }
-    let context = Supplementary.Context(
-      viewProvidingTarget: .viewForSupplementary,
-      elementKind: kind,
-      indexPath: indexPath,
-      collectionView: collectionView,
-      collectionViewLayout: collectionViewLayout,
-      environment: environment
-    )
-    switch kind {
-    case UICollectionView.elementKindSectionHeader:
-      guard let header = section.header else {
-        return dequeueUnknownSupplementaryView()
-      }
-      let view = header.viewProvider(context)
-      header.updateViewHandler(view, context)
-      return view
-    case UICollectionView.elementKindSectionFooter:
-      guard let footer = section.footer else {
-        return dequeueUnknownSupplementaryView()
-      }
-      let view = footer.viewProvider(context)
-      footer.updateViewHandler(view, context)
-      return view
-    default:
-      return dequeueUnknownSupplementaryView()
-    }
   }
   
   // MARK: UICollectionViewDelegate
@@ -137,14 +145,14 @@ open class UICollectionViewBridgingController
     forItemAt indexPath: IndexPath
   ) {
     guard let item = validItem(at: indexPath) else { return }
+    
+    // Prepare context for item.
     let context = Item.Context(
-      cellProvidingTarget: .cellForItem,
       indexPath: indexPath,
       collectionView: collectionView,
       collectionViewLayout: collectionViewLayout,
       environment: environment
     )
-    let cell = item.cellProvider(context)
     item.onWillAppearHandler?(cell, context)
   }
   
@@ -155,6 +163,8 @@ open class UICollectionViewBridgingController
     at indexPath: IndexPath
   ) {
     guard let section = validSection(atIndex: indexPath.section) else { return }
+    
+    // Prepare context for item.
     let context = Supplementary.Context(
       viewProvidingTarget: .viewForSupplementary,
       elementKind: elementKind,
@@ -163,14 +173,15 @@ open class UICollectionViewBridgingController
       collectionViewLayout: collectionViewLayout,
       environment: environment
     )
+    
     switch elementKind {
     case UICollectionView.elementKindSectionHeader:
       guard let header = section.header else { return }
-      let view = header.viewProvider(context)
+      
       header.onWillAppearHandler?(view, context)
     case UICollectionView.elementKindSectionFooter:
       guard let footer = section.footer else { return }
-      let view = footer.viewProvider(context)
+      
       footer.onWillAppearHandler?(view, context)
     default:
       return
@@ -181,15 +192,18 @@ open class UICollectionViewBridgingController
     _ collectionView: UICollectionView,
     didSelectItemAt indexPath: IndexPath
   ) {
-    guard let item = validItem(at: indexPath) else { return }
+    guard let item = validItem(at: indexPath),
+          let cell = collectionView.cellForItem(at: indexPath)
+    else { return }
+    
+    // Prepare context for item.
     let context = Item.Context(
-      cellProvidingTarget: .cellForItem,
       indexPath: indexPath,
       collectionView: collectionView,
       collectionViewLayout: collectionViewLayout,
       environment: environment
     )
-    let cell = item.cellProvider(context)
+    
     item.onSelectHandler?(cell, context)
   }
   
@@ -204,7 +218,6 @@ open class UICollectionViewBridgingController
     
     // Prepare context for item.
     let context = Item.Context(
-      cellProvidingTarget: .sizeForItem,
       indexPath: indexPath,
       collectionView: collectionView,
       collectionViewLayout: collectionViewLayout,
@@ -222,6 +235,8 @@ open class UICollectionViewBridgingController
     guard let header = validSection(atIndex: section)?.header else {
       return .zero
     }
+    
+    // Prepare context for item.
     // There is only one header in a section so it's ok to use the first item
     // index path as reference for whole section.
     let context = Supplementary.Context(
@@ -234,6 +249,7 @@ open class UICollectionViewBridgingController
     )
     let view = header.viewProvider(context)
     header.updateViewHandler(view, context)
+    
     return header.sizeProvider(view, context)
   }
   
@@ -245,6 +261,8 @@ open class UICollectionViewBridgingController
     guard let footer = validSection(atIndex: section)?.footer else {
       return .zero
     }
+    
+    // Prepare context for item.
     // There is only one footer in a section so it's ok to use the first item
     // index path as reference for whole section.
     let context = Supplementary.Context(
@@ -257,6 +275,7 @@ open class UICollectionViewBridgingController
     )
     let view = footer.viewProvider(context)
     footer.updateViewHandler(view, context)
+    
     return footer.sizeProvider(view, context)
   }
 }
@@ -292,17 +311,19 @@ extension UICollectionViewBridgingController {
   /// Access a valid section if the given index is within bounds of `sections`. But if the index is out of
   /// bounds, the function will return nil instead.
   private func validSection(atIndex index: Int) -> Section? {
-    guard index < sections.count else { return nil }
+    guard (index < sections.count) else { return nil }
+    
     return sections[index]
   }
   
   /// Access a valid item if the given index path is within bounds of `sections`. But if the index path is out
   /// of bounds, the function will return nil instead.
   private func validItem(at indexPath: IndexPath) -> Item? {
-    guard let section = validSection(atIndex: indexPath.section) else {
+    guard let section = validSection(atIndex: indexPath.section),
+          (indexPath.item < section.items.count) else {
       return nil
     }
-    guard indexPath.item < section.items.count else { return nil }
+    
     return section.items[indexPath.item]
   }
 }

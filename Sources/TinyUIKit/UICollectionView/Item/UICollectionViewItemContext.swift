@@ -8,8 +8,6 @@
 import UIKit
 
 public struct UICollectionViewItemContext {
-  @available(*, deprecated)
-  public var cellProvidingTarget: CellProvidingTarget
   public var indexPath: IndexPath
   public var collectionView: UICollectionView
   public var collectionViewLayout: UICollectionViewLayout
@@ -20,12 +18,4 @@ public struct UICollectionViewItemContext {
 
 extension UICollectionViewItemContext {
   public typealias Environment = UIEnvironmentValues
-  
-  public enum CellProvidingTarget {
-    /// For `collectionView(_:layout:sizeForItemAt:)`.
-    case sizeForItem
-    
-    /// For `collectionView(_:cellForItemAt:)`.
-    case cellForItem
-  }
 }
