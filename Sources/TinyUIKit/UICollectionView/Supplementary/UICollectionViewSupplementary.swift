@@ -8,54 +8,74 @@
 import UIKit
 
 public struct UICollectionViewSupplementary {
+  
+  // MARK: States
+  
+  public var id: String
+  
+  // MARK: Resolvers
+  
   var viewProvider: ViewProvider
   var updateViewHandler: UpdateViewHandler
   var sizeProvider: SizeProvider
-  private(set) var onWillAppearHandler: OnWillAppearHandler?
+  var onWillAppearHandler: OnWillAppearHandler?
 }
 
 extension UICollectionViewSupplementary {
   public init<Content: UIViewRepresentable>(
+    id: String? = nil,
     reuseIdentifier: String? = nil,
     content: Content,
-    contentForSizeProvider: Content? = nil,
     sizeProvider: @escaping SizeProvider
   ) {
     let reuseIdentifier = reuseIdentifier ?? String(describing: View.self)
+    
     self.init(
+      id: id ?? UUID().uuidString,
       viewProvider: { context in
-        switch context.viewProvidingTarget {
-        case .sizeForSupplementary:
-          return View()
-        case .viewForSupplementary:
-          context.collectionView.register(
-            View.self,
-            forSupplementaryViewOfKind: context.elementKind,
-            withReuseIdentifier: reuseIdentifier
-          )
-          return context.collectionView.dequeueReusableSupplementaryView(
-            ofKind: context.elementKind,
-            withReuseIdentifier: reuseIdentifier,
-            for: context.indexPath
-          ) as! View
-        }
-      },
-      updateViewHandler: { view, context in
-        let view = view as! View
-        let targetContent: Content
-        switch context.viewProvidingTarget {
-        case .sizeForSupplementary:
-          targetContent = contentForSizeProvider ?? content
-        case .viewForSupplementary:
-          targetContent = content
-        }
-        view.updateUI(
-          with: targetContent,
-          context: Content.Context(
-            coordinator: targetContent.makeCoordinator(),
-            environment: context.environment
-          )
+        context.collectionView.register(
+          View.self,
+          forSupplementaryViewOfKind: context.elementKind,
+          withReuseIdentifier: reuseIdentifier
         )
+        
+        return context.collectionView.dequeueReusableSupplementaryView(
+          ofKind: context.elementKind,
+          withReuseIdentifier: reuseIdentifier,
+          for: context.indexPath
+        ) as! View
+      },
+      updateViewHandler: { view, itemContext in
+        let view = view as! View
+        
+        // Prepare context for content view.
+        let viewContext = Content.Context(
+          coordinator: content.makeCoordinator(),
+          environment: itemContext.environment
+        )
+        
+        // Start to resolve content view.
+        let contentView: Content.UIViewType
+        
+        if let bridgingView = view.bridgingView {
+          // Reuse the existing content view from the target cell.
+          contentView = bridgingView
+        } else {
+          // Making a new content view.
+          contentView = content.makeUIView(context: viewContext)
+        }
+        
+        // Install content view on cell.
+        if (contentView.superview === view) {
+          // Content view is already installed on the target cell.
+        } else {
+          view.installBridgingView(contentView)
+        }
+        
+        // Finish to resolve content view.
+        
+        // Update content view.
+        content.updateUIView(contentView, context: viewContext)
       },
       sizeProvider: sizeProvider
     )
@@ -68,24 +88,34 @@ extension UICollectionViewSupplementary {
   }
   
   public init<Content: UIViewRepresentable>(
+    id: String? = nil,
     reuseIdentifier: String? = nil,
     content: Content,
-    contentForSizeProvider: Content? = nil,
     sizeProvider: UICollectionViewSupplementarySizeProvider? = nil
   ) {
     self.init(
+      id: id,
       reuseIdentifier: reuseIdentifier,
       content: content,
-      contentForSizeProvider: contentForSizeProvider,
-      sizeProvider: { view, context in
+      sizeProvider: { itemContext in
         let sizeProvider: UICollectionViewSupplementarySizeProvider
           = sizeProvider ?? .fittingCompressedSize
+        
+        // Prepare context for content view.
+        let viewContext = Content.Context(
+          coordinator: content.makeCoordinator(),
+          environment: itemContext.environment
+        )
+        let view = content.makeUIView(context: viewContext)
+        
+        content.updateUIView(view, context: viewContext)
+        
         return sizeProvider.collectionView(
-          context.collectionView,
-          context.collectionViewLayout,
-          elementKind: context.elementKind,
+          itemContext.collectionView,
+          itemContext.collectionViewLayout,
+          elementKind: itemContext.elementKind,
           sizeFor: view,
-          at: context.indexPath
+          at: itemContext.indexPath
         )
       }
     )
@@ -100,6 +130,7 @@ extension UICollectionViewSupplementary {
   ) -> UICollectionViewSupplementary {
     var newValue = self
     newValue.onWillAppearHandler = handler
+    
     return newValue
   }
 }
@@ -113,9 +144,7 @@ extension UICollectionViewSupplementary {
     UICollectionReusableView,
     Context
   ) -> Void
-  public typealias SizeProvider = (
-    UICollectionReusableView,
-    Context
-  ) -> CGSize
-  public typealias OnWillAppearHandler = (UICollectionReusableView, Context) -> Void
+  public typealias SizeProvider = (Context) -> CGSize
+  public typealias OnWillAppearHandler = (UICollectionReusableView, Context)
+  -> Void
 }

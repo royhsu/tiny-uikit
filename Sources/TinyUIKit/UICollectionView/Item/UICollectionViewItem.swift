@@ -54,27 +54,27 @@ extension UICollectionViewItem {
         )
         
         // Start to resolve content view.
-        let view: Content.UIViewType
+        let contentView: Content.UIViewType
         
         if let bridgingView = cell.bridgingView {
           // Reuse the existing content view from the target cell.
-          view = bridgingView
+          contentView = bridgingView
         } else {
           // Making a new content view.
-          view = content.makeUIView(context: viewContext)
+          contentView = content.makeUIView(context: viewContext)
         }
         
         // Install content view on cell.
-        if (view.superview === cell.contentView) {
+        if (contentView.superview === cell.contentView) {
           // Content view is already installed on the target cell.
         } else {
-          cell.installBridgingView(view)
+          cell.installBridgingView(contentView)
         }
         
         // Finish to resolve content view.
         
         // Update content view.
-        content.updateUIView(view, context: viewContext)
+        content.updateUIView(contentView, context: viewContext)
       },
       sizeProvider: sizeProvider
     )
@@ -85,11 +85,13 @@ extension UICollectionViewItem {
   }
   
   public init<Content: UIViewRepresentable>(
+    id: String? = nil,
     reuseIdentifier: String? = nil,
     content: Content,
     sizeProvider: UICollectionViewItemSizeProvider? = nil
   ) {
     self.init(
+      id: id,
       reuseIdentifier: reuseIdentifier,
       content: content,
       sizeProvider: { itemContext in
@@ -101,7 +103,6 @@ extension UICollectionViewItem {
           coordinator: content.makeCoordinator(),
           environment: itemContext.environment
         )
-        
         let view = content.makeUIView(context: viewContext)
         
         content.updateUIView(view, context: viewContext)
@@ -125,6 +126,7 @@ extension UICollectionViewItem {
   ) -> UICollectionViewItem {
     var newValue = self
     newValue.onWillAppearHandler = handler
+    
     return newValue
   }
   
@@ -133,6 +135,7 @@ extension UICollectionViewItem {
   ) -> UICollectionViewItem {
     var newValue = self
     newValue.onSelectHandler = handler
+    
     return newValue
   }
 }

@@ -8,5 +8,7 @@
 import UIKit
 
 final class UICollectionViewUnknownSupplementaryView: UICollectionReusableView {
-  static let reuseIdentifier = String(describing: self)
+  static let reuseIdentifier = String(
+    describing: UICollectionViewUnknownSupplementaryView.self
+  )
 }

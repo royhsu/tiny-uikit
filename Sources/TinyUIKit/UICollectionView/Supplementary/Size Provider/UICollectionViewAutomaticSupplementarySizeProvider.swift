@@ -16,7 +16,7 @@ public struct UICollectionViewAutomaticSupplementarySizeProvider
     _ collectionView: UICollectionView,
     _ collectionViewLayout: UICollectionViewLayout,
     elementKind: String,
-    sizeFor view: UICollectionReusableView,
+    sizeFor view: UIView,
     at indexPath: IndexPath
   ) -> CGSize {
     view.systemLayoutSizeFitting(targetSize)

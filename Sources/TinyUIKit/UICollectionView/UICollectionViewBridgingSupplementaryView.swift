@@ -9,10 +9,12 @@ import UIKit
 
 public final class UICollectionViewBridgingSupplementaryView
 <UIViewType: UIView>: UICollectionReusableView {
-  private(set) weak var bridgeView: UIViewType?
+  private(set) weak var bridgingView: UIViewType?
   
   public override func prepareForReuse() {
-    let reusableView = bridgeView as? Reusable
+    super.prepareForReuse()
+    
+    let reusableView = bridgingView as? Reusable
     reusableView?.prepareForReuse()
   }
 }
@@ -20,30 +22,25 @@ public final class UICollectionViewBridgingSupplementaryView
 // MARK: - Helpers
 
 extension UICollectionViewBridgingSupplementaryView {
-  func updateUI<Value: UIViewRepresentable>(
-    with value: Value,
-    context: Value.Context
-  ) where Value.UIViewType == UIViewType {
-    if let bridgeView = bridgeView,
-       bridgeView.superview === self {
-      value.updateUIView(bridgeView, context: context)
-    } else {
-      let newView = value.makeUIView(context: context)
-      value.updateUIView(newView, context: context)
-      bridgeView = newView
-      
-      // Layout.
-      newView.translatesAutoresizingMaskIntoConstraints = false
-      addSubview(newView)
-      NSLayoutConstraint.activate([
-        // Horizontal.
-        newView.leadingAnchor.constraint(equalTo: leadingAnchor),
-        newView.trailingAnchor.constraint(equalTo: trailingAnchor),
+  public func installBridgingView(_ view: UIViewType) {
+    // Uninstall old bridging view before installing new one.
+    bridgingView?.removeFromSuperview()
+    
+    // Keep the weak reference to the new bridging view.
+    bridgingView = view
+    
+    // Handle layout.
+    view.translatesAutoresizingMaskIntoConstraints = false
+    addSubview(view)
+    
+    NSLayoutConstraint.activate([
+      // Horizontal axis.
+      view.leadingAnchor.constraint(equalTo: leadingAnchor),
+      view.trailingAnchor.constraint(equalTo: trailingAnchor),
         
-        // Vertical.
-        newView.topAnchor.constraint(equalTo: topAnchor),
-        newView.bottomAnchor.constraint(equalTo: bottomAnchor),
-      ])
-    }
+      // Vertical axis.
+      view.topAnchor.constraint(equalTo: topAnchor),
+      view.bottomAnchor.constraint(equalTo: bottomAnchor),
+    ])
   }
 }

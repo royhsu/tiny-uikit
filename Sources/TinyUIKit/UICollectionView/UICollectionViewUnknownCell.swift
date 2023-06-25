@@ -8,5 +8,7 @@
 import UIKit
 
 final class UICollectionViewUnknownCell: UICollectionViewCell {
-  static let reuseIdentifier = String(describing: self)
+  static let reuseIdentifier = String(
+    describing: UICollectionViewUnknownCell.self
+  )
 }

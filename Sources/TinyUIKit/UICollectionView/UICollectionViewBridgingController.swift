@@ -94,7 +94,6 @@ open class UICollectionViewBridgingController
     
     // Prepare context for item.
     let context = Supplementary.Context(
-      viewProvidingTarget: .viewForSupplementary,
       elementKind: kind,
       indexPath: indexPath,
       collectionView: collectionView,
@@ -166,7 +165,6 @@ open class UICollectionViewBridgingController
     
     // Prepare context for item.
     let context = Supplementary.Context(
-      viewProvidingTarget: .viewForSupplementary,
       elementKind: elementKind,
       indexPath: indexPath,
       collectionView: collectionView,
@@ -240,17 +238,14 @@ open class UICollectionViewBridgingController
     // There is only one header in a section so it's ok to use the first item
     // index path as reference for whole section.
     let context = Supplementary.Context(
-      viewProvidingTarget: .sizeForSupplementary,
       elementKind: UICollectionView.elementKindSectionHeader,
       indexPath: IndexPath(item: 0, section: section),
       collectionView: collectionView,
       collectionViewLayout: collectionViewLayout,
       environment: environment
     )
-    let view = header.viewProvider(context)
-    header.updateViewHandler(view, context)
     
-    return header.sizeProvider(view, context)
+    return header.sizeProvider(context)
   }
   
   public func collectionView(
@@ -266,17 +261,14 @@ open class UICollectionViewBridgingController
     // There is only one footer in a section so it's ok to use the first item
     // index path as reference for whole section.
     let context = Supplementary.Context(
-      viewProvidingTarget: .sizeForSupplementary,
       elementKind: UICollectionView.elementKindSectionFooter,
       indexPath: IndexPath(item: 0, section: section),
       collectionView: collectionView,
       collectionViewLayout: collectionViewLayout,
       environment: environment
     )
-    let view = footer.viewProvider(context)
-    footer.updateViewHandler(view, context)
     
-    return footer.sizeProvider(view, context)
+    return footer.sizeProvider(context)
   }
 }
 

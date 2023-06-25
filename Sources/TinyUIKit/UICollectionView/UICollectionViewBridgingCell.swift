@@ -13,6 +13,7 @@ public final class UICollectionViewBridgingCell<UIViewType: UIView>
   
   public override func prepareForReuse() {
     super.prepareForReuse()
+    
     let reusableView = bridgingView as? Reusable
     reusableView?.prepareForReuse()
   }
