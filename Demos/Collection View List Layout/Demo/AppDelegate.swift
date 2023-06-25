@@ -18,7 +18,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
   ) -> Bool {
     let newWindow = UIWindow(frame: UIScreen.main.bounds)
     window = newWindow
-    newWindow.rootViewController = ContactListController()
+    newWindow.rootViewController = ContactListViewController()
     newWindow.makeKeyAndVisible()
     return true
   }

@@ -7,21 +7,23 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		B097F4A12A47CEF90062C9DB /* ContactCategoryCarouselViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B097F4A02A47CEF80062C9DB /* ContactCategoryCarouselViewController.swift */; };
 		B0D2BD6E27B6A81E0096714C /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0D2BD6D27B6A81E0096714C /* AppDelegate.swift */; };
 		B0D2BD7727B6A8200096714C /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B0D2BD7627B6A8200096714C /* Assets.xcassets */; };
 		B0D2BD7A27B6A8200096714C /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B0D2BD7827B6A8200096714C /* LaunchScreen.storyboard */; };
-		B0D2BD8327B6A8580096714C /* ContactListController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0D2BD8227B6A8580096714C /* ContactListController.swift */; };
+		B0D2BD8327B6A8580096714C /* ContactListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0D2BD8227B6A8580096714C /* ContactListViewController.swift */; };
 		B0D2BD8627B6A8820096714C /* TinyUIKit in Frameworks */ = {isa = PBXBuildFile; productRef = B0D2BD8527B6A8820096714C /* TinyUIKit */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		B0036E8127B7383F00FC64EC /* tiny-uikit */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = "tiny-uikit"; path = ../../..; sourceTree = "<group>"; };
+		B097F4A02A47CEF80062C9DB /* ContactCategoryCarouselViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactCategoryCarouselViewController.swift; sourceTree = "<group>"; };
 		B0D2BD6A27B6A81E0096714C /* Demo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Demo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		B0D2BD6D27B6A81E0096714C /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		B0D2BD7627B6A8200096714C /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		B0D2BD7927B6A8200096714C /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		B0D2BD7B27B6A8200096714C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		B0D2BD8227B6A8580096714C /* ContactListController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ContactListController.swift; sourceTree = "<group>"; };
+		B0D2BD8227B6A8580096714C /* ContactListViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ContactListViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -58,7 +60,8 @@
 			children = (
 				B0036E8127B7383F00FC64EC /* tiny-uikit */,
 				B0D2BD6D27B6A81E0096714C /* AppDelegate.swift */,
-				B0D2BD8227B6A8580096714C /* ContactListController.swift */,
+				B0D2BD8227B6A8580096714C /* ContactListViewController.swift */,
+				B097F4A02A47CEF80062C9DB /* ContactCategoryCarouselViewController.swift */,
 				B0D2BD7627B6A8200096714C /* Assets.xcassets */,
 				B0D2BD7827B6A8200096714C /* LaunchScreen.storyboard */,
 				B0D2BD7B27B6A8200096714C /* Info.plist */,
@@ -147,7 +150,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				B0D2BD6E27B6A81E0096714C /* AppDelegate.swift in Sources */,
-				B0D2BD8327B6A8580096714C /* ContactListController.swift in Sources */,
+				B0D2BD8327B6A8580096714C /* ContactListViewController.swift in Sources */,
+				B097F4A12A47CEF90062C9DB /* ContactCategoryCarouselViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

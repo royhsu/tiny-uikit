@@ -8,20 +8,45 @@
 import TinyUIKit
 import UIKit
 
-final class ContactListController: UIViewController {
-//  private let contentViewController = UITableViewBridgeController<Void>()
+final class ContactListViewController: UIViewController {
   private let listLayout: UICollectionViewFlowLayout = {
     let layout = UICollectionViewFlowLayout()
     layout.sectionHeadersPinToVisibleBounds = true
     return layout
   }()
-  private typealias Section = UICollectionViewBridgingController.Section
-  private typealias Item = UICollectionViewBridgingController.Item
   private lazy var contentViewController =
     UICollectionViewBridgingController(collectionViewLayout: listLayout)
+  private lazy var categoryCarouselViewController
+    = ContactCategoryCarouselViewController()
   
   override func viewDidLoad() {
     super.viewDidLoad()
+    
+    installRootContentViewController()
+  }
+  
+  override func viewDidAppear(_ animated: Bool) {
+    super.viewDidAppear(animated)
+    updateUI()
+  }
+  
+  override func viewWillTransition(
+    to size: CGSize,
+    with coordinator: UIViewControllerTransitionCoordinator
+  ) {
+    super.viewWillTransition(to: size, with: coordinator)
+    
+    coordinator.animate { _ in
+      self.updateUI()
+    } completion: { _ in
+      self.updateUI()
+    }
+  }
+  
+  func updateUI() {
+    let layoutInfo = UILayoutInfo(
+      scrollView: contentViewController.collectionView
+    )
     
     contentViewController.collectionView.layoutMargins = .zero
     contentViewController.sections = [
@@ -44,6 +69,17 @@ final class ContactListController: UIViewController {
           Item(
             content: UIContactRow(),
             sizeProvider: .listLayout
+          ),
+          Item(
+            content: HostingView(
+              contentView: categoryCarouselViewController.view
+            ),
+            sizeProvider: { _ in
+              CGSize(
+                width: layoutInfo.contentViewRect.width,
+                height: 150.0
+              )
+            }
           ),
           Item(
             content: UIContactRow(),
@@ -83,6 +119,46 @@ final class ContactListController: UIViewController {
             content: UIContactRow(),
             sizeProvider: .listLayout
           ),
+          Item(
+            content: UIContactRow(),
+            sizeProvider: .listLayout
+          ),
+          Item(
+            content: UIContactRow(),
+            sizeProvider: .listLayout
+          ),
+          Item(
+            content: UIContactRow(),
+            sizeProvider: .listLayout
+          ),
+          Item(
+            content: UIContactRow(),
+            sizeProvider: .listLayout
+          ),
+          Item(
+            content: UIContactRow(),
+            sizeProvider: .listLayout
+          ),
+          Item(
+            content: UIContactRow(),
+            sizeProvider: .listLayout
+          ),
+          Item(
+            content: UIContactRow(),
+            sizeProvider: .listLayout
+          ),
+          Item(
+            content: UIContactRow(),
+            sizeProvider: .listLayout
+          ),
+          Item(
+            content: UIContactRow(),
+            sizeProvider: .listLayout
+          ),
+          Item(
+            content: UIContactRow(),
+            sizeProvider: .listLayout
+          ),
         ],
         footer: UICollectionViewSupplementary(content: UIContactListHeader())
           .onWillAppear { _, _ in print("Footer appeared.") }
@@ -91,51 +167,88 @@ final class ContactListController: UIViewController {
     contentViewController.collectionView.backgroundColor = .white
     contentViewController.collectionView.reloadData()
     
+    categoryCarouselViewController.updateUI()
+  }
+}
+
+// MARK: - Sections
+
+extension ContactListViewController {
+  typealias Section = UICollectionViewBridgingController.Section
+  typealias Item = UICollectionViewBridgingController.Item
+}
+
+// MARK: - Helpers
+
+extension ContactListViewController {
+  private func installRootContentViewController() {
     addChild(contentViewController)
     
+    // Handle layout.
     let contentView = contentViewController.view!
     
-    // Layout.
     contentView.translatesAutoresizingMaskIntoConstraints = false
     view.addSubview(contentView)
+    
+    // Install active constraints.
     NSLayoutConstraint.activate([
-        // Horizontal.
-        contentView.leadingAnchor
-          .constraint(equalTo: view.leadingAnchor),
-        contentView.trailingAnchor
-          .constraint(equalTo: view.trailingAnchor),
+      // Horizontal axis.
+      contentView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+      contentView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
         
-        // Vertical.
-        contentView.topAnchor
-          .constraint(equalTo: view.topAnchor),
-        contentView.bottomAnchor
-          .constraint(equalTo: view.bottomAnchor),
-        
-//      // Horizontal.
-//      contentView.leadingAnchor
-//        .constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
-//      contentView.trailingAnchor
-//        .constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
-//
-//      // Vertical.
-//      contentView.topAnchor
-//        .constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
-//      contentView.bottomAnchor
-//        .constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
+      // Vertical axis.
+      contentView.topAnchor.constraint(equalTo: view.topAnchor),
+      contentView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
     ])
     
     contentViewController.didMove(toParent: self)
   }
+}
+
+public struct UILayoutInfo {
+  public var containerViewSize: CGSize
+  public var contentInsets: UIEdgeInsets
   
-  override func viewWillTransition(
-    to size: CGSize,
-    with coordinator: UIViewControllerTransitionCoordinator
+  public init(
+    containerViewSize: CGSize,
+    contentInsets: UIEdgeInsets
   ) {
-    super.viewWillTransition(to: size, with: coordinator)
-    coordinator.animate { context in
-      self.contentViewController.collectionViewLayout.invalidateLayout()
-    } completion: { context in }
+    self.containerViewSize = containerViewSize
+    self.contentInsets = contentInsets
   }
+}
+
+extension UILayoutInfo {
+  public init(scrollView: UIScrollView) {
+    self.init(
+      containerViewSize: scrollView.bounds.size,
+      contentInsets: scrollView.adjustedContentInset
+    )
+  }
+}
+
+extension UILayoutInfo {
+  /// The rectangle area that represents the combination area of `contentViewRect` and `contentInsets`.
+  private var containerViewRect: CGRect {
+    CGRect(origin: .zero, size: containerViewSize)
+  }
+  
+  /// The rectangle area that places content.
+  public var contentViewRect: CGRect {
+    containerViewRect.inset(by: contentInsets)
+  }
+}
+
+struct HostingView: UIViewRepresentable {
+  let contentView: UIView
+  
+  func makeUIView(context: Context) -> UIView {
+    contentView
+  }
+  
+  func updateUIView(_ view: UIView, context: Context) {}
+  
+  typealias Coordinator = Void
 }
 
 struct UIContactRow: UIViewRepresentable {
