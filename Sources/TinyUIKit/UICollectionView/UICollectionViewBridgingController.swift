@@ -56,7 +56,9 @@ open class UICollectionViewBridgingController
     _ collectionView: UICollectionView,
     numberOfItemsInSection section: Int
   ) -> Int {
-    sections[section].items.count
+    let section = validSection(atIndex: section)
+    
+    return section?.items.count ?? 0
   }
   
   public override func collectionView(
@@ -228,6 +230,52 @@ open class UICollectionViewBridgingController
   public func collectionView(
     _ collectionView: UICollectionView,
     layout collectionViewLayout: UICollectionViewLayout,
+    insetForSectionAt section: Int
+  ) -> UIEdgeInsets {
+    let section = validSection(atIndex: section)
+    
+    return section?.sectionConfiguration?.rootContentInsets ?? .zero
+  }
+  
+  public func collectionView(
+    _ collectionView: UICollectionView,
+    layout collectionViewLayout: UICollectionViewLayout,
+    minimumInteritemSpacingForSectionAt section: Int
+  ) -> CGFloat {
+    let section = validSection(atIndex: section)
+    
+    if let minimumInteritemSpacing = section?.sectionConfiguration?
+      .minimumInteritemSpacing {
+      return minimumInteritemSpacing
+    } else if let flowLayout = collectionViewLayout
+                as? UICollectionViewFlowLayout {
+      return flowLayout.minimumInteritemSpacing
+    } else {
+      return 0.0
+    }
+  }
+
+  public func collectionView(
+    _ collectionView: UICollectionView,
+    layout collectionViewLayout: UICollectionViewLayout,
+    minimumLineSpacingForSectionAt section: Int
+  ) -> CGFloat {
+    let section = validSection(atIndex: section)
+    
+    if let minimumLineSpacing = section?.sectionConfiguration?
+      .minimumLineSpacing {
+      return minimumLineSpacing
+    } else if let flowLayout = collectionViewLayout
+                as? UICollectionViewFlowLayout {
+      return flowLayout.minimumLineSpacing
+    } else {
+      return 0.0
+    }
+  }
+
+  public func collectionView(
+    _ collectionView: UICollectionView,
+    layout collectionViewLayout: UICollectionViewLayout,
     referenceSizeForHeaderInSection section: Int
   ) -> CGSize {
     guard let header = validSection(atIndex: section)?.header else {
@@ -284,25 +332,46 @@ extension UICollectionViewBridgingController {
     public var items: [Item]
     public var footer: Supplementary?
     public var decorations: [Supplementary]
+    public var sectionConfiguration: Configuration?
     
     public init(
       id: String? = nil,
       header: Supplementary? = nil,
       items: [Item],
       footer: Supplementary? = nil,
-      decorations: [Supplementary]? = nil
+      decorations: [Supplementary]? = nil,
+      sectionConfiguration: Configuration? = nil
     ) {
       self.id = id ?? UUID().uuidString
       self.header = header
       self.items = items
       self.footer = footer
       self.decorations = decorations ?? []
+      self.sectionConfiguration = sectionConfiguration
+    }
+    
+    public typealias Configuration = SectionConfiguration
+  }
+  
+  public struct SectionConfiguration {
+    public var rootContentInsets: UIEdgeInsets?
+    public var minimumInteritemSpacing: CGFloat?
+    public var minimumLineSpacing: CGFloat?
+    
+    public init(
+      rootContentInsets: UIEdgeInsets? = nil,
+      minimumInteritemSpacing: CGFloat? = nil,
+      minimumLineSpacing: CGFloat? = nil
+    ) {
+      self.rootContentInsets = rootContentInsets
+      self.minimumInteritemSpacing = minimumInteritemSpacing
+      self.minimumLineSpacing = minimumLineSpacing
     }
   }
   
   /// Access a valid section if the given index is within bounds of `sections`. But if the index is out of
   /// bounds, the function will return nil instead.
-  private func validSection(atIndex index: Int) -> Section? {
+  public func validSection(atIndex index: Int) -> Section? {
     guard (index < sections.count) else { return nil }
     
     return sections[index]
@@ -310,7 +379,7 @@ extension UICollectionViewBridgingController {
   
   /// Access a valid item if the given index path is within bounds of `sections`. But if the index path is out
   /// of bounds, the function will return nil instead.
-  private func validItem(at indexPath: IndexPath) -> Item? {
+  public func validItem(at indexPath: IndexPath) -> Item? {
     guard let section = validSection(atIndex: indexPath.section),
           (indexPath.item < section.items.count) else {
       return nil
